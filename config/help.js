@@ -152,6 +152,10 @@ export const helpList = [{
     desc: '查看管理命令(即本页)'
   }, {
     icon: 0,
+    title: '#虚境更新',
+    desc: 'git 拉取最新代码(同 #更新虚境/#虚境更新插件)'
+  }, {
+    icon: 0,
     title: '#秘境播报测试',
     desc: '测试当天秘境播报(调试用)'
   }, {

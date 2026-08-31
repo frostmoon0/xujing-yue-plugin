@@ -159,6 +159,18 @@
 
 ### 安装说明🖥️
 
+**方式一：git clone（推荐，支持 `#虚境更新`）**
+
+```bash
+git clone https://gitee.com/frost-moon05/xujing-yue-plugin.git plugins/xujing-yue-plugin
+```
+
+GitHub 备用：`git clone https://github.com/frostmoon0/xujing-yue-plugin.git plugins/xujing-yue-plugin`
+
+安装后，Bot 主人发送 `#虚境更新` 即可拉取最新代码（更新完成后请重启 Bot 生效）。
+
+**方式二：手动放置**
+
 - 将本插件目录放入 BOT 根目录的 `plugins` 文件夹下，重启 Bot 即可（依赖 Yunzai-Bot v3）
 - 配置变更后使用 `#虚境重置配置` 进行配置更新操作（**注意**：该指令会覆盖本地修改，使用后请重新按需求设置）
 - 可选：安装 [Guoba-Plugin（锅巴）](https://gitee.com/guoba-yunzai/guoba-plugin) 后，可在 Web 面板中可视化修改本插件配置
