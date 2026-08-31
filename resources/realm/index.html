@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/realm/index.css">
+  <style>
+    body {
+      background: url("{{_res_path}}/help/imgs/{{bg}}") right center !important;
+      background-size: cover !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="realm-container">
+    <div class="realm-head">
+      <div class="realm-title">🌌 虚境 · 天下秘境</div>
+      <div class="realm-sub">{{sub}} · #进入秘境 / #攻击屏障 / #撤离</div>
+    </div>
+
+    {{if empty}}
+    <div class="realm-empty">当前没有现世的秘境，静候天机~</div>
+    {{/if}}
+
+    {{each realms}}
+    <div class="realm-card {{$value.cardCls}}">
+      <div class="realm-card-head">
+        <span class="realm-label">{{$value.label}}</span>
+        <span class="realm-card-title">{{$value.title}}</span>
+        <span class="realm-diff"><span class="q{{$value.diffQ}}">{{$value.diffName}}</span><span class="realm-req">{{$value.diffRealm}}</span></span>
+      </div>
+      <div class="realm-meta">
+        <span class="realm-region">📍 {{$value.region}}</span>
+        {{if $value.isExplore}}<span class="realm-left">⏳ 剩余 {{$value.exploreLeft}} 分钟</span>{{/if}}
+      </div>
+
+      {{if $value.isBarrier}}
+      <div class="realm-barrier">
+        <div class="realm-bar-row">
+          <span class="realm-bar-name">🛡️ {{$value.barrierName}}</span>
+          <span class="realm-bar-pct">{{$value.barrierPct}}%</span>
+        </div>
+        <div class="realm-bar"><div class="realm-bar-fill" style="width: {{$value.barrierPct}}%"></div></div>
+        <div class="realm-bar-hp">{{$value.barrierHp}} / {{$value.barrierMax}}</div>
+        {{if $value.autoPlayers}}<div class="realm-auto">⚔️ 玩家持续破界：{{$value.autoPlayers}}</div>{{/if}}
+        <div class="realm-tip">对应大区内回复 #攻击屏障 即可破界；#进入秘境 参加探索</div>
+      </div>
+      {{/if}}
+
+      {{if $value.desc}}<div class="realm-desc">📜 {{$value.desc}}</div>{{/if}}
+
+      {{if $value.rewards.length}}
+      <div class="realm-rewards">
+        <div class="realm-rewards-title">🎁 品质掉落概率</div>
+        <div class="realm-rewards-list">
+          {{each $value.rewards}}
+          <span class="realm-reward"><span class="realm-reward-icon">{{$value.icon}}</span><span class="q{{$value.q}}">{{$value.name}} {{$value.pct}}%</span></span>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{if $value.teams.length}}
+      <div class="realm-teams">
+        <div class="realm-teams-title">👥 场内队伍</div>
+        {{each $value.teams}}
+        <div class="realm-team">
+          <span class="realm-team-name">{{$value.name}}</span>
+          <span class="realm-team-tag {{$value.kind}}">{{$value.tag}}</span>
+          <span class="realm-team-action">{{$value.action}}</span>
+          <span class="realm-team-loot">🎁 {{$value.loot}}</span>
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
+    </div>
+    {{/each}}
+
+    <div class="realm-foot">秘境行动由系统推进 · 队长收到遭遇后回复数字 · #撤离 结算离场 · Powered by xujing-yue-plugin</div>
+  </div>
+</body>
+</html>

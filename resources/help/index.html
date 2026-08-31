@@ -1,0 +1,42 @@
+{{extend defaultLayout}}
+
+{{block 'css'}}
+<link rel="stylesheet" type="text/css" href="{{_res_path}}/help/index.css" />
+<style>
+  .container {
+    background: url("{{_res_path}}/help/imgs/{{bg}}") center center !important;
+    /* cover: 等比铺满不拉伸变形, 仅裁剪超出部分, 保证背景图不被破坏 */
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+  }
+</style>
+{{/block}}
+
+{{block 'main'}}
+
+<div class="info-box">
+  <div class="head-box type{{bgType}}">
+    <div class="title">{{helpCfg.title||"使用帮助"}}</div>
+    <div class="label">{{helpCfg.subTitle || "xujing-yue-plugin"}}</div>
+  </div>
+</div>
+
+<div class="help-wrap">
+{{each helpGroup group}}
+{{set len = group?.list?.length || 0 }}
+<div class="cont-box {{ len > 12 ? 'wide' : '' }}">
+  <div class="help-group">{{group.group}}</div>
+  {{if len > 0}}
+  <div class="help-table">
+    {{each group.list help}}
+    <div class="td">
+      <strong class="help-title">{{help.title}}</strong>
+      <span class="help-desc">{{help.desc}}</span>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+</div>
+{{/each}}
+</div>
+{{/block}}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/auction/index.css">
+  <style>
+    body {
+      background: url("{{_res_path}}/help/imgs/{{bg}}") right center !important;
+      background-size: cover !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="auction-container">
+    <div class="auction-head">
+      <div class="auction-title">🏪 虚境拍卖行</div>
+      <div class="auction-sub">本群拍卖 · 共 {{count}} 件在拍</div>
+    </div>
+    {{if settledList && settledList.length}}
+    <div class="auction-settled">
+      {{each settledList s}}
+      <div class="auction-settle-item">{{s}}</div>
+      {{/each}}
+    </div>
+    {{/if}}
+    <div class="auction-body">
+      {{each auctionList item}}
+      <div class="auction-item">
+        <div class="auction-id">#{{item.id}}</div>
+        <div class="auction-info">
+          <div class="auction-name">{{item.icon}}{{item.name}} ×{{item.count}}</div>
+          <div class="auction-meta">起拍 {{item.startPrice}} · 当前 {{item.cur}}{{if item.curNick}}（{{item.curNick}}）{{/if}}{{if item.buyNow}} · 一口价 {{item.buyNow}}{{/if}}</div>
+        </div>
+        <div class="auction-right">
+          <div class="auction-remain">⏳ {{item.remainH}}小时</div>
+          <div class="auction-seller">卖家 {{item.seller}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    <div class="auction-foot">#虚境出价 编号 金额 / #虚境一口价 编号 / #虚境下架 编号 · Powered by xujing-yue-plugin</div>
+  </div>
+</body>
+</html>

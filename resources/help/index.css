@@ -1,0 +1,116 @@
+body {
+  transform: scale(1);
+  width: 720px;
+  background: url("../common/theme/bg-01.jpg");
+}
+
+.container {
+  /* cover: 等比铺满不拉伸变形, 仅裁剪超出部分, 背景图不被破坏 */
+  background-size: cover;
+  width: 720px;
+}
+
+.head-box {
+  margin: 60px 0 0 0;
+  padding-bottom: 0;
+}
+
+.head-box .title {
+  font-size: 50px;
+}
+
+.cont-box {
+  /* border-radius: 15px; */
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 5px;
+  overflow: hidden;
+  /* box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.15); */
+  position: relative;
+  font-size: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #1e1f20;
+}
+
+/* 帮助大区布局：整面板单列纵向排布(窄长, 贴合竖版背景图不空白), 每个大区内部自动分列 */
+.help-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.help-wrap .cont-box {
+  box-sizing: border-box;
+  margin: 0;
+}
+/* 只有一个大区时(如管理帮助)占满整行 */
+.help-wrap .cont-box:only-child {
+  grid-column: 1 / -1;
+}
+
+.help-group {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 15px 15px 10px 20px;
+}
+
+.help-table {
+  text-align: center;
+  border-collapse: collapse;
+  margin: 0;
+  border-radius: 0 0 10px 10px;
+  display: grid;
+  /* 大区内列数由宽度自适应，保证文字横向(720宽下为2列) */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  overflow: hidden;
+  width: 100%;
+  color: rgb(0, 0, 0);
+}
+
+.help-table .tr {
+  display: table-row;
+}
+
+.help-table .td,
+.help-table .th {
+  font-size: 14px;
+  display: block;
+  box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.12);
+  padding: 12px 6px;
+  line-height: 24px;
+  position: relative;
+  text-align: center;
+  color: #1e1f20;
+  text-shadow: none;
+}
+
+.help-table .tr:last-child .td {
+  padding-bottom: 12px;
+}
+
+.help-table .th {
+  background: rgba(243, 239, 239, 0.898);
+}
+
+.help-title {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  /* 黑色实心文字 */
+  color: #000000;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.help-desc {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  color: #1e1f20;
+  text-shadow: none;
+}
+
+/*# sourceMappingURL=index.css.map */

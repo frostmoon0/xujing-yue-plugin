@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="#"/>
+    <link rel="preload" href="{{_res_path}}common/font/HYWH-65W.woff" as="font" type="font/woff">
+    <link rel="preload" href="{{_res_path}}common/font/NZBZ.woff" as="font" type="font/woff">
+    <link rel="stylesheet" type="text/css" href="{{_res_path}}common/common.css"/>
+    <link rel="stylesheet" type="text/css" href="{{_res_path}}/text/index.css"/>
+    <style>
+      .container {
+        background: url("{{_res_path}}/help/imgs/{{bg}}") right center !important;
+        background-size: cover !important;
+      }
+    </style>
+    <title>xujing-yue-plugin</title>
+  </head>
+  <body class="layout-columns-{{columns}}">
+    <div class="container" id="container">
+      <div class="text-wrap">
+        <div class="text-card">
+          {{if columns == 7}}
+          <div class="content-columns content-columns-7">
+            <div class="content content-first">{{column1Content}}</div>
+            <div class="content content-middle">{{column2Content}}</div>
+            <div class="content content-backpack">{{column3Content}}</div>
+          </div>
+          {{else if columns == 6}}
+          <div class="content-columns content-columns-6">
+            <div class="content">{{column1Content}}</div>
+            <div class="content content-middle">{{column2Content}}</div>
+            <div class="content content-backpack">{{column3Content}}</div>
+          </div>
+          {{else if columns == 4}}
+          <div class="content-columns content-columns-4">
+            <div class="content">{{column1Content}}</div>
+            <div class="content">{{column2Content}}</div>
+            <div class="content content-backpack">{{column3Content}}</div>
+          </div>
+          {{else if columns == 3}}
+          <div class="content-columns content-columns-3">
+            <div class="content">{{column1Content}}</div>
+            <div class="content">{{column2Content}}</div>
+            <div class="content">{{column3Content}}</div>
+          </div>
+          {{else if columns == 2}}
+          <div class="content-columns">
+            <div class="content">{{leftContent}}</div>
+            <div class="content">{{rightContent}}</div>
+          </div>
+          {{else}}
+          <div class="content">{{content}}</div>
+          {{/if}}
+        </div>
+      </div>
+      {{if pageInfo}}
+      <div class="page-info">{{pageInfo}}</div>
+      {{/if}}
+    </div>
+  </body>
+</html>

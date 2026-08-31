@@ -1,0 +1,74 @@
+{
+    "1": {
+        "name": "青萝小筑",
+        "space": 3,
+        "price": 7000,
+        "loveup": 0.2,
+        "work": 100,
+        "hug": 50,
+        "cultivate": 100
+    },
+    "2": {
+        "name": "兰亭雅居",
+        "space": 4,
+        "price": 15000,
+        "loveup": 0.5,
+        "work": 200,
+        "hug": 100,
+        "cultivate": 200
+    },
+    "3": {
+        "name": "海棠别院",
+        "space": 6,
+        "price": 30000,
+        "loveup": 0.8,
+        "work": 300,
+        "hug": 150,
+        "cultivate": 300
+    },
+    "4": {
+        "name": "锦绣山庄",
+        "space": 8,
+        "price": 50000,
+        "loveup": 1.2,
+        "work": 400,
+        "hug": 200,
+        "cultivate": 400
+    },
+    "5": {
+        "name": "琉璃阁",
+        "space": 12,
+        "price": 80000,
+        "loveup": 1.8,
+        "work": 500,
+        "hug": 300,
+        "cultivate": 500
+    },
+    "6": {
+        "name": "凤栖宫",
+        "space": 16,
+        "price": 240000,
+        "loveup": 2.5,
+        "work": 600,
+        "hug": 400,
+        "cultivate": 600
+    },
+    "7": {
+        "name": "月华仙府",
+        "space": 20,
+        "price": 400000,
+        "loveup": 3.5,
+        "work": 800,
+        "hug": 500,
+        "cultivate": 800
+    },
+    "8": {
+        "name": "瑶池仙地",
+        "space": 30,
+        "price": 700000,
+        "loveup": 5,
+        "work": 1000,
+        "hug": 600,
+        "cultivate": 1000
+    }
+}

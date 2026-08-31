@@ -1,0 +1,100 @@
+body {
+  transform: scale(1);
+  width: 1250px;
+  background: url("../common/theme/bg-01.jpg");
+}
+
+.container {
+  background-size: cover;
+  width: 1250px;
+}
+
+.text-wrap {
+  padding: 50px 45px 15px;
+}
+
+.text-card {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #1e1f20;
+  padding: 30px 35px;
+}
+
+.content {
+  font-size: 22px;
+  line-height: 38px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #1e1f20;
+  text-shadow: none;
+}
+
+.content-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.layout-columns-7,
+.layout-columns-7 .container {
+  width: 2120px;
+}
+
+.content-columns-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.content-columns-7 .content-first {
+  grid-column: span 2;
+}
+
+.content-columns-7 .content-middle {
+  grid-column: span 2;
+}
+
+.content-columns-7 .content-backpack {
+  grid-column: span 3;
+}
+
+.layout-columns-6,
+.layout-columns-6 .container {
+  width: 1810px;
+}
+
+.content-columns-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.content-columns-6 .content-middle {
+  grid-column: span 2;
+}
+
+.content-columns-6 .content-backpack {
+  grid-column: span 3;
+}
+
+.content-columns-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.content-columns-4 .content-backpack {
+  grid-column: span 2;
+}
+
+.content-columns .content {
+  min-width: 0;
+}
+
+.page-info {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(30, 31, 32, 0.6);
+  margin-top: 10px;
+  padding-bottom: 15px;
+}

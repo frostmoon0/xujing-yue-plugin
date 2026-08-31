@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/rank/index.css">
+</head>
+<body>
+  <div class="rank-container">
+    <div class="rank-head">
+      <div class="rank-title">{{rankTitle || '🌌 幻境试炼 · 伤害排行榜'}}</div>
+      <div class="rank-sub">{{rankSub || '虚境幻境 · 守卫溃败之日'}} · {{rankDate}}</div>
+    </div>
+    <div class="rank-body">
+      {{each rankList item}}
+      <div class="rank-row {{item.cls}}">
+        <div class="rank-no">{{item.medal}}</div>
+        <div class="rank-info">
+          <div class="rank-nick">{{item.nick}}</div>
+          {{if rankShowLevel !== false}}
+          <div class="rank-level">{{item.levelname}} · 战力 {{item.power}}</div>
+          {{/if}}
+          {{if item.need > 0}}
+          <div class="rank-bar">
+            <div class="rank-bar-fill" style="width: {{item.progress}}%"></div>
+          </div>
+          {{/if}}
+        </div>
+        <div class="rank-dmg">
+          <div class="rank-dmg-num">{{item.dmg}}</div>
+          <div class="rank-dmg-label">{{rankValueLabel || '伤害'}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{if rankStats && rankStats.length}}
+    <div class="rank-stats">
+      {{each rankStats s}}
+      <span class="rank-stat">{{s.name}} ×{{s.count}}</span>
+      {{/each}}
+    </div>
+    {{/if}}
+    <div class="rank-foot">{{rankFoot || '每日0点结算 · 发送 #幻境试炼 挑战你的输出 · Powered by xujing-yue-plugin'}}</div>
+  </div>
+</body>
+</html>

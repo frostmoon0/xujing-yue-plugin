@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/itemlist/index.css">
+  <style>
+    body {
+      background: url("{{_res_path}}/help/imgs/{{bg}}") right center !important;
+      /* 100% 100%: 整张背景拉伸铺满, 不裁剪, 保证背景图显示全 */
+      background-size: 100% 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="item-container">
+    <div class="item-head">
+      <div class="item-title">🎒 虚境道具目录</div>
+      <div class="item-sub">所有道具 · 获得方式（未标注获取途径的暂为未知）</div>
+    </div>
+    {{each groups group}}
+    <div class="item-group">
+      <div class="group-title">{{group.title}}</div>
+      <div class="group-body">
+        {{each group.list it}}
+        <div class="item-card">
+          <div class="item-main">
+            <div class="item-name"><span class="item-icon">{{it.icon}}</span><span class="{{it.qCls}}">{{it.name}}</span></div>
+            <div class="item-attr">{{it.attr}}</div>
+          </div>
+          <div class="item-source {{it.sourceCls}}">🎁 {{it.source}}</div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/each}}
+    <div class="item-foot">发送 #道具目录 查看 · Powered by xujing-yue-plugin</div>
+  </div>
+</body>
+</html>

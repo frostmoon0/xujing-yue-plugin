@@ -1,0 +1,332 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 720px;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  color: #f0e6d8;
+  padding: 26px 22px 20px;
+}
+
+.realm-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶部标题 */
+.realm-head {
+  text-align: center;
+  padding: 16px 0 18px;
+  border-bottom: 2px solid rgba(120, 200, 255, 0.35);
+  background: radial-gradient(ellipse at center, rgba(90, 160, 255, 0.16), transparent 70%);
+}
+
+.realm-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #8fd0ff;
+  text-shadow: 0 0 20px rgba(90, 170, 255, 0.65);
+  letter-spacing: 4px;
+}
+
+.realm-sub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #c0b8ae;
+}
+
+/* 空状态 */
+.realm-empty {
+  margin-top: 18px;
+  padding: 30px;
+  text-align: center;
+  font-size: 16px;
+  color: #b7a894;
+  border-radius: 12px;
+  background: rgba(16, 12, 8, 0.5);
+  border: 1px dashed rgba(200, 180, 140, 0.3);
+}
+
+/* 秘境卡片 */
+.realm-card {
+  margin-top: 14px;
+  border-radius: 12px;
+  background: rgba(14, 12, 10, 0.62);
+  border: 1px solid rgba(180, 200, 255, 0.2);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.38);
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+.realm-card.private {
+  background: rgba(20, 10, 24, 0.66);
+  border-color: rgba(210, 150, 255, 0.32);
+}
+
+/* 卡片头: 标签 + 标题 + 阶别 */
+.realm-card-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.realm-label {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(90, 170, 255, 0.18);
+  border: 1px solid rgba(90, 170, 255, 0.4);
+  color: #9fd4ff;
+  white-space: nowrap;
+}
+
+.realm-card.private .realm-label {
+  background: rgba(210, 150, 255, 0.2);
+  border-color: rgba(210, 150, 255, 0.45);
+  color: #d9b0ff;
+}
+
+.realm-card-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: #ffe9c4;
+  white-space: nowrap;
+}
+
+.realm-diff {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  justify-content: flex-end;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.realm-req {
+  font-size: 12px;
+  font-weight: 400;
+  color: #9e907e;
+  -webkit-text-fill-color: #9e907e;
+}
+
+.realm-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #cbb8a2;
+}
+
+/* 屏障 */
+.realm-barrier {
+  margin-top: 9px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: rgba(255, 80, 70, 0.08);
+  border: 1px solid rgba(255, 110, 90, 0.25);
+}
+
+.realm-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #ffb3a5;
+}
+
+.realm-bar-pct {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ff8a7a;
+  text-shadow: 0 0 8px rgba(255, 110, 90, 0.5);
+}
+
+.realm-bar {
+  margin-top: 6px;
+  height: 9px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.realm-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #ff5f5f, #ff9a3d);
+  box-shadow: 0 0 10px rgba(255, 100, 80, 0.6);
+  transition: width 0.4s ease;
+}
+
+.realm-bar-hp {
+  margin-top: 5px;
+  text-align: right;
+  font-size: 12px;
+  color: #b07a72;
+}
+
+.realm-auto {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #ffc46b;
+}
+
+.realm-tip {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9e8a7e;
+}
+
+/* 描述 */
+.realm-desc {
+  margin-top: 9px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #c9b49c;
+}
+
+/* 奖励池 */
+.realm-rewards {
+  margin-top: 10px;
+}
+
+.realm-rewards-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffd9a0;
+  margin-bottom: 6px;
+}
+
+.realm-rewards-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.realm-reward {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  white-space: nowrap;
+}
+
+.realm-reward-icon {
+  margin-right: 3px;
+}
+
+/* 队伍 */
+.realm-teams {
+  margin-top: 10px;
+}
+
+.realm-teams-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #a9d5ff;
+  margin-bottom: 6px;
+}
+
+.realm-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 5px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.realm-team-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f0e6d8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.realm-team-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(90, 170, 255, 0.16);
+  border: 1px solid rgba(90, 170, 255, 0.4);
+  color: #9fd4ff;
+  white-space: nowrap;
+}
+
+.realm-team-tag.fake {
+  background: rgba(220, 150, 90, 0.16);
+  border-color: rgba(220, 150, 90, 0.4);
+  color: #ffc48a;
+}
+
+.realm-team-action {
+  flex: 0 0 auto;
+  max-width: 40%;
+  font-size: 12px;
+  color: #cbb8a2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.realm-team-loot {
+  flex: 1 0 100%;
+  font-size: 12px;
+  color: #ffd9a0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  margin-top: 2px;
+}
+
+/* 品质配色: 红 = 火红流光(彩), 彩 = 彩虹渐变 */
+.q1 { color: #ffffff; }
+.q2 { color: #7ef08a; }
+.q3 { color: #6fc7ff; }
+.q4 { color: #d6a2ff; }
+.q5 { color: #ffd24a; text-shadow: 0 0 6px rgba(255, 200, 60, 0.5); }
+.q6 {
+  background: linear-gradient(135deg, #ff5f6d 0%, #ff9a3d 40%, #ffd75c 70%, #ff9a5f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #ff6b6b;
+  filter: drop-shadow(0 0 6px rgba(255, 100, 70, 0.4));
+}
+.q7 {
+  background: linear-gradient(135deg, #ff5f6d, #ffd75c, #7cf0a0, #6fc7ff, #d9a8ff, #ff8fd8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #ff8fd8;
+  filter: drop-shadow(0 0 6px rgba(255, 150, 255, 0.45));
+}
+
+/* 底部 */
+.realm-foot {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: #9a8a78;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(200, 180, 140, 0.25);
+}

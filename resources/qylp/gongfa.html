@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/qylp/gongfa.css">
+  <style>
+    body {
+      background: url("{{_res_path}}/help/imgs/{{bg}}") right center !important;
+      background-size: cover !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="gf-container">
+    <div class="gf-head">
+      <div class="gf-title">📜 功法图鉴</div>
+      <div class="gf-sub">共28种功法 · 金及以下可在藏宝阁购买 · 红/彩秘境掉落</div>
+    </div>
+    {{each groups}}
+    <div class="gf-group">
+      <div class="gf-group-title q{{$value.quality}}">{{$value.icon}} {{$value.name}}功法（{{$value.list.length}}本）</div>
+      <div class="gf-grid">
+        {{each $value.list}}
+        <div class="gf-card q{{$value.quality}}">
+          <div class="gf-card-top">
+            <span class="gf-card-name">{{$value.name}}</span>
+            {{if $value.mark}}<span class="gf-mark">{{$value.mark}}</span>{{/if}}
+          </div>
+          <div class="gf-card-fx">{{$value.fx}}</div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/each}}
+    <div class="gf-foot">发送 #功法 查看我的功法库 · #运转功法 &lt;名&gt; 激活 · Powered by xujing-yue-plugin</div>
+  </div>
+</body>
+</html>

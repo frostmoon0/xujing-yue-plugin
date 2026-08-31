@@ -1,0 +1,122 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 760px;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: linear-gradient(160deg, #f2e8dc 0%, #faf0e6 45%, #f5e9db 100%);
+  color: #222;
+  padding: 30px 28px 22px;
+}
+
+.auction-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶部标题 */
+.auction-head {
+  text-align: center;
+  padding: 18px 0 20px;
+  border-bottom: 2px solid rgba(160, 0, 0, 0.25);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.5), transparent 70%);
+}
+
+.auction-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #7a0000;
+  text-shadow: 0 0 12px rgba(255, 150, 150, 0.5);
+  letter-spacing: 3px;
+}
+
+.auction-sub {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* 过期结算播报 */
+.auction-settled {
+  padding: 12px 4px 2px;
+}
+
+.auction-settle-item {
+  margin-bottom: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  color: #333;
+}
+
+/* 在拍列表 */
+.auction-body {
+  padding: 14px 0 6px;
+}
+
+.auction-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.auction-id {
+  width: 54px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: #a00000;
+}
+
+.auction-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.auction-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.auction-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #555;
+}
+
+.auction-right {
+  text-align: right;
+}
+
+.auction-remain {
+  font-size: 18px;
+  font-weight: 700;
+  color: #a35a00;
+}
+
+.auction-seller {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #444;
+}
+
+/* 底部 */
+.auction-foot {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: #555;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
+}

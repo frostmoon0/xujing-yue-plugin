@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/rank/pet.css">
+</head>
+<body>
+  <div class="pet-rank">
+    <div class="pet-head">
+      <div class="pet-title">{{rankTitle || '🐾 虚境 · 灵兽榜'}}</div>
+      <div class="pet-sub">{{rankSub || '谁家灵兽 · 可冠群雄'}} · {{rankDate}}</div>
+    </div>
+    <div class="pet-body">
+      {{each rankList item}}
+      <div class="pet-row {{item.cls}}">
+        <div class="pet-no">{{item.medal}}</div>
+        <div class="pet-main">
+          <div class="pet-line1">
+            <span class="pet-qual" style="color:{{item.qualityColor}}">{{item.qualityIcon}}</span>
+            <span class="pet-name" style="{{item.qualityStyle}}">{{item.name}}</span>
+            {{if item.hatch}}<span class="pet-badge">蛋</span>{{/if}}
+            {{if !item.canBattle}}<span class="pet-badge">幼</span>{{/if}}
+            <span class="pet-owner">· {{item.nick}}</span>
+          </div>
+          <div class="pet-line2">血脉【{{item.bloodline}}】· {{item.stage}}{{if item.hatch}} · 孵化 {{item.progress}}%{{/if}} · 当前战力 <b class="pet-power">{{item.power}}</b></div>
+          <div class="pet-line3">满成长战力 {{item.maxPower}}{{if item.canBattle}} · {{item.stage}}成长 {{item.progress}}%{{/if}}</div>
+          <div class="pet-bar"><div class="pet-bar-fill" style="width: {{item.progress}}%"></div></div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{if rankStats && rankStats.length}}
+    <div class="pet-stats">
+      {{each rankStats s}}<span class="pet-stat">{{s.name}} ×{{s.count}}</span>{{/each}}
+    </div>
+    {{/if}}
+    <div class="pet-foot">{{rankFoot || '发送 #宠物出战 让灵兽上榜 · #宠物目录 览天下灵兽 · Powered by xujing-yue-plugin'}}</div>
+  </div>
+</body>
+</html>

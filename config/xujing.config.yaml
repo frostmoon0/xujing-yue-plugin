@@ -1,0 +1,143 @@
+name_cfg:
+  priority_names:
+    - 忘忧
+    - 星鱼
+    - 长生
+    - 枫狸
+    - 白忆安
+duel_cfg:
+  Magnification: 8
+  Cooling_time: 300
+  cdtime_exercise: 60
+  cdtime_break: 30
+wife_cfg:
+  qqwife: 3
+  sjwife: 5
+  sjcd: 60
+  qqcd: 60
+  bbcd: 60
+  fkcd: 120
+  ggcd: 120
+  qlpcd: 60
+  poorcd: 1440
+  RBBgetcd: 720
+  gifttime: 1
+  notice: F
+  group:
+    - 123456789
+    - 123123123
+  RBBtime: 20
+  secret_notice: T
+  secret_group:
+    - 136303457
+  secret_time: 20
+  afk_notice: T
+  afk_group:
+    - "136303457"
+  afk_hour: 24
+  afk_money: 2400
+  afk_lp: 300
+trial_cfg:
+  trial_notice: T
+  trial_group:
+    - "136303457"
+  trial_cd: 2
+  trial_rounds: 10
+duel_cfg.Magnification: 8
+duel_cfg.Cooling_time: 300
+duel_cfg.cdtime_exercise: 60
+duel_cfg.cdtime_break: 30
+wife_cfg.qqwife: 3
+wife_cfg.sjwife: 5
+wife_cfg.sjcd: 60
+wife_cfg.qqcd: 60
+wife_cfg.bbcd: 60
+wife_cfg.fkcd: 120
+wife_cfg.ggcd: 120
+wife_cfg.qlpcd: 60
+wife_cfg.poorcd: 1440
+wife_cfg.RBBgetcd: 720
+wife_cfg.gifttime: 1
+wife_cfg.notice: F
+wife_cfg.group:
+  - 123456789
+  - 123123123
+wife_cfg.RBBtime: 20
+wife_cfg.secret_notice: T
+wife_cfg.secret_group:
+  - 136303457
+wife_cfg.secret_time: 20
+wife_cfg.afk_notice: T
+wife_cfg.afk_group:
+  - "136303457"
+wife_cfg.afk_hour: 24
+wife_cfg.afk_money: 2400
+wife_cfg.afk_lp: 300
+trial_cfg.trial_notice: T
+trial_cfg.trial_group:
+  - "136303457"
+trial_cfg.trial_cd: 2
+trial_cfg.trial_rounds: 10
+limit_cfg:
+  time: 6
+  notice: F
+reply_cfg:
+  min_length: 50
+  max_length: 600
+name_cfg.priority_names:
+  - 忘忧
+  - 星鱼
+  - 长生
+  - 枫狸
+  - 白忆安
+  - 小楠
+  - 不简
+  - 罗文·逸
+  - 小纸鸢
+  - 希希
+realm_cfg:
+  enable: T
+  group:
+    - 136303457
+  spawn_per_cycle: 3
+  cycle_hours: 24
+  first_spawn_hours:
+    - 3
+    - 18
+  next_spawn_hours:
+    - 2
+    - 12
+  explore_min:
+    - 15
+    - 60
+  action_cd_min: 1
+  max_steps: 20
+  loot_cap: 5
+  event_max: 4
+  night_stop: T
+  extra_rewards: []
+realm_cfg.enable: F
+realm_cfg.extra_rewards: []
+realm_cfg.group:
+  - 136303457
+realm_cfg.spawn_per_cycle: 3
+realm_cfg.cycle_hours: 24
+realm_cfg.first_spawn_hours:
+  - 3
+  - 18
+realm_cfg.next_spawn_hours:
+  - 2
+  - 12
+realm_cfg.explore_min:
+  - 15
+  - 60
+realm_cfg.action_cd_min: 1
+realm_cfg.max_steps: 20
+realm_cfg.loot_cap: 5
+realm_cfg.event_max: 4
+realm_cfg.night_stop: T
+# 闲置灵石清理(自动挂机检测扩展): 超期未使用虚境指令的玩家清空灵石余额
+idle_cfg:
+  enable: T
+  days: 5
+  group: []

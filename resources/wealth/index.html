@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{_res_path}}/wealth/index.css">
+</head>
+<body>
+  <div class="rank-container">
+    <div class="rank-head">
+      <div class="rank-ornament">☄ ✦ ☄</div>
+      <div class="rank-title">{{rankTitle || '天下灵石'}}</div>
+      <div class="rank-sub">{{rankSub || '虚境 · 本群财富排行'}} · <span class="date">{{rankDate}}</span></div>
+    </div>
+    <div class="rank-body">
+      {{each rankList item}}
+      <div class="rank-row {{item.cls}}">
+        <div class="rank-badge">{{item.medal}}</div>
+        <div class="rank-info">
+          <div class="rank-nick">{{item.nick}}</div>
+          {{if item.tag}}
+          <div class="rank-tag">{{item.tag}}</div>
+          {{/if}}
+        </div>
+        <div class="rank-dmg">
+          <div class="rank-dmg-num">{{item.dmg}}</div>
+          <div class="rank-dmg-label">💰 {{rankValueLabel || '灵石'}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    <div class="rank-foot">{{rankFoot || '发送 #天下灵石 查看本群财富排行 · Powered by xujing-yue-plugin'}}</div>
+  </div>
+</body>
+</html>
