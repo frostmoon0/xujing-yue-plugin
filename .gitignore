@@ -8,3 +8,10 @@ node_modules/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# 内部开发文档（仅本地使用，不推送）
+AI交接文档.md
+CHANGELOG.md
+
+# 帮助面板图片（仅本地使用，不推送）
+resources/help/imgs/
