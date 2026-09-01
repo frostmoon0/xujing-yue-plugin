@@ -42,7 +42,7 @@ export class xujing_update extends plugin {
     try {
       await gitRun('rev-parse --git-dir')
     } catch {
-      e.reply('本插件不是通过 git 安装的，无法自动更新。\n建议用 git clone 安装后再使用 #虚境更新：\ngit clone https://gitee.com/frost-moon05/xujing-yue-plugin.git plugins/xujing-yue-plugin')
+      e.reply('本插件不是通过 git 安装的，无法自动更新。\n建议用 git clone 安装后再使用 #虚境更新：\ngit clone https://gitee.com/frost-moon05/xujing-plugin.git plugins/xujing-yue-plugin')
       return true
     }
     /* 3. 确定分支与远程：优先 origin（clone 自带），无则回退 gitee/github */

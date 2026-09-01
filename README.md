@@ -176,10 +176,10 @@
 **方式一：git clone（推荐，支持 `#虚境更新`）**
 
 ```bash
-git clone https://gitee.com/frost-moon05/xujing-yue-plugin.git plugins/xujing-yue-plugin
+git clone https://gitee.com/frost-moon05/xujing-plugin.git plugins/xujing-yue-plugin
 ```
 
-GitHub 备用：`git clone https://github.com/frostmoon0/xujing-yue-plugin.git plugins/xujing-yue-plugin`
+GitHub 备用：`git clone https://github.com/frostmoon0/xujing-plugin.git plugins/xujing-yue-plugin`
 
 安装后，Bot 主人发送 `#虚境更新` 即可拉取最新代码（更新完成后请重启 Bot 生效）。
 
