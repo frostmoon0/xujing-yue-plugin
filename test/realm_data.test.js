@@ -209,3 +209,14 @@ test('多个组队申请不会互相覆盖', () => {
   assert.deepEqual(f.rogueTeams.rt1.members, ['100', '101', '102'])
   assert.equal(rogueTeamOf(f, '102').id, 'rt1')
 })
+
+test('破界后首次行动错峰：2~6分钟随机且不全部撞同一时刻', () => {
+  const now = 1_000_000
+  const times = new Set(Array.from({ length: 60 }, () => _test.firstWaveAt(now)))
+  for (const t of times) {
+    assert.ok(t >= now + 2 * 60000, `首次行动过早: ${t}`)
+    assert.ok(t <= now + 6 * 60000, `首次行动过晚: ${t}`)
+  }
+  /* 60 次采样里不应全部落在同一个时刻，否则探索第一波仍会同步推进刷屏 */
+  assert.ok(times.size >= 2, `错峰区间无差异: ${[...times].join(',')}`)
+})

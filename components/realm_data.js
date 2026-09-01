@@ -290,6 +290,11 @@ function pick (arr) { return arr[Math.floor(Math.random() * arr.length)] }
 export function actionDelay () {
   return Math.round((2 + Math.random() * 1) * 60000)
 }
+/** 探索开始后的首次行动错峰(2~6分钟随机): 破界阶段积累的队伍行动时间早已过期,
+ *  统一重排一次, 避免探索第一波所有队伍同步推进, 一次性刷出大量播报 */
+export function firstWaveAt (now = Date.now()) {
+  return now + actionDelay() + randRange([0, 3]) * 60000
+}
 function isNight (now = new Date()) { const h = now.getHours(); return h >= 1 && h < 6 }
 export { isNight, reconcileFakeBusy }
 
@@ -715,8 +720,12 @@ export async function breakBarrier (st, gid) {
   const sorted = Object.keys(st.barrier?.damage || {}).sort((a, b) => st.barrier.damage[b] - st.barrier.damage[a])
   const hero = sorted.find(x => /^\d+$/.test(x)) || null
   st.phase = 'explore'; st.startAt = Date.now(); st.endAt = Date.now() + st.exploreMin * 60000
+  /* 破界后错峰: 已到伪玩家标记入场; 所有破界阶段积累的队伍重排下一次行动,
+   * 避免探索第一波全队同步推进一次性刷出大量播报 */
+  const now = Date.now()
   for (const t of Object.values(st.teams || {})) {
-    if (t.kind === 'fake' && (!t.arrivalAt || Date.now() >= t.arrivalAt)) { t.arrived = true; t.entered = true }
+    if (t.kind === 'fake' && (!t.arrivalAt || now >= t.arrivalAt)) { t.arrived = true; t.entered = true }
+    t.nextActionAt = firstWaveAt(now)
   }
   markFakesBusy(gid, st); saveRealmState(st, gid)
   let reward = []
@@ -1699,4 +1708,4 @@ export async function settleAll (st, gid, cfg = DEF_CFG) {
 
 /* ---------- 辅助/测试 ---------- */
 export function _testEmptyRealm () { return emptyRealm() }
-export const _test = { randRange, pick, buildNode, planSplit, emptyRealm, disposalPlan, normalizeDisposalIndex, fakeDisposalIndex, extractPoolShare, inventoryLootLimit, moneyLootAmount }
+export const _test = { randRange, pick, buildNode, planSplit, emptyRealm, disposalPlan, normalizeDisposalIndex, fakeDisposalIndex, extractPoolShare, inventoryLootLimit, moneyLootAmount, actionDelay, firstWaveAt }
