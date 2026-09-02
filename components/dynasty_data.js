@@ -6,7 +6,7 @@
  *   → 50% 按宗门好感加权送入一宗门宝库 / 50% 入城库存(#屠城自动洗劫库存)
  * 屠城: 需身在简月王朝 + 装备万魂幡 + 已学会血炼大阵 + 布置材料
  *   读阵30分钟, 每分钟消耗1万灵石; 灵石不足即自动停止并销毁大阵, 需重新布置
- *   读完=收魂(1人1魂)+自动清空库存+屠城者宗门好感-30+城进6~88h废墟
+ *   读完=收魂(1人1魂)+业力(1人1点)+自动清空库存+屠城者宗门好感-30+城进6~88h废墟
  * 阻止: 他人读阵中, 身在王朝且有宗门者可 #阻止屠城 → 读阵失败, 阻止者所属宗门该城好感+10
  * ============================================================ */
 import fs from 'fs'
@@ -589,6 +589,8 @@ async function completeSlaughter (gid, d, c, now, rand) {
   const specialTxt = specialDrop ? `，额外获得${itemIcon(specialDrop)}${specialDrop}×1` : ''
   /* 收魂: 1人1魂(未装备万魂幡则没收) */
   const gained = Wanhun.captureSoul(uid, gid, 1, pop)
+  const karma = await xujing_data.addPlayerKarma(gid, uid, pop)
+  const karmaTxt = `，业力 +${pop}（当前${karma}）`
   const soulTxt = (gained && gained.gained > 0)
     ? `，万魂幡收魂 +${gained.gained}`
     : '，万魂幡未装备，未收到魂'
@@ -611,8 +613,8 @@ async function completeSlaughter (gid, d, c, now, rand) {
   untrackRead(gid, uid)
   pushProd(d, c.name, -plundered, '屠城清空', now)
   const nick = await nickOf(gid, uid)
-  logPlayerEvent(gid, `【屠城】散修 ${nick} 血洗【${c.name}】，收魂 ${pop} 缕，劫走${itemIcon('云裳仙蕊')}云裳仙蕊 ${plundered} 朵！`)
-  notify(gid, `🩸【${c.name}】被屠城！${nick} 收魂 ${pop} 缕${soulTxt}，劫走${itemIcon('云裳仙蕊')}云裳仙蕊 ${plundered} 朵${sectDropTxt}${specialTxt}。\n城池化为废墟，约 ${rec} 小时后恢复。`)
+  logPlayerEvent(gid, `【屠城】散修 ${nick} 血洗【${c.name}】，收魂 ${pop} 缕，业力 +${pop}，劫走${itemIcon('云裳仙蕊')}云裳仙蕊 ${plundered} 朵！`)
+  notify(gid, `🩸【${c.name}】被屠城！${nick} 收魂 ${pop} 缕${soulTxt}${karmaTxt}，劫走${itemIcon('云裳仙蕊')}云裳仙蕊 ${plundered} 朵${sectDropTxt}${specialTxt}。\n城池化为废墟，约 ${rec} 小时后恢复。`)
   return { specialDrop }
 }
 
