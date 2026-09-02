@@ -17,6 +17,25 @@ import { rollRedReward, addDismantleMats, RED_DISMANTLE_COLOR_ORE, colorDismantl
 import { Wanhun, getWanhunPanel } from '../../components/wanhun_data.js'
 import Yanghun from '../../components/yanghun_data.js'
 const pendingChoice = {}
+const pendingSellMode = {}
+const SELL_CHOICE_TIMEOUT = 5 * 60 * 1000
+
+function sellKey (e) { return `${e.group_id}:${e.user_id}` }
+function pendingSellIsAll (e) {
+    const key = sellKey(e)
+    const pending = pendingSellMode[key]
+    if (!pending || Date.now() - pending.time > SELL_CHOICE_TIMEOUT) {
+        delete pendingSellMode[key]
+        return false
+    }
+    return pending.mode === 'all'
+}
+function setPendingSellMode (e, mode) {
+    pendingSellMode[sellKey(e)] = { mode, time: Date.now() }
+}
+function clearPendingSellMode (e) {
+    delete pendingSellMode[sellKey(e)]
+}
 
 /** 将信息按板块均衡分到左右两区, 中间区占两列、背包区占三列 */
 function splitInfoColumns (lines) {
@@ -78,7 +97,8 @@ export class equip extends plugin {
                 { reg: '^[#＃]?脱下(武器|头盔|胸甲|裤子|鞋子|戒指|全部)$', fnc: 'takeoff' },
                 { reg: '^[#＃]?(一键穿戴|一键装备|一键穿上|自动穿戴|穿最好的)$', fnc: 'autoequip' },
                 { reg: '^[#＃]?(一键出售功法|出售功法|卖掉功法|出售功法书)(.*)$', fnc: 'sellGongfa' },
-                { reg: '^[#＃]?(一键出售|出售装备|卖掉装备)(.*)$', fnc: 'sellEquip' },
+                { reg: '^[#＃]?一键出售(.*)$', fnc: 'sellAll' },
+                { reg: '^[#＃]?(出售装备|卖掉装备)(.*)$', fnc: 'sellEquip' },
                 { reg: '^[#＃]?(分解红装)$', fnc: 'dismantleRed' },
                 { reg: '^[#＃]?(分解彩装)$', fnc: 'dismantleColor' },
                 { reg: '^[#＃]?(一键分解红装|全部分解红装)$', fnc: 'dismantleRedAll' },
@@ -644,7 +664,7 @@ export class equip extends plugin {
         /* 一键出售: 当前交互锁为 sell 时优先处理数字 */
         if (await isCurrent(e.group_id, e.user_id, 'sell')) {
             if (await guardActionLocked(e)) return true
-            return await this.sellEquip(e)
+            return pendingSellIsAll(e) ? await this.sellAll(e) : await this.sellEquip(e)
         }
         /* 分解红装: 仅当 dismantle 在栈顶才处理数字(被其它交互埋住则让位, 避免误分解被埋的红装) */
         if (await isCurrent(e.group_id, e.user_id, 'dismantle')) {
@@ -879,9 +899,109 @@ export class equip extends plugin {
         return true
     }
 
+    /** #一键出售 N: 同时出售 N 品质及以下的未穿戴装备和功法书; 红装/红彩功法不可出售 */
+    async sellAll(e) {
+        await unlock(e.group_id, e.user_id, 'sell')//先释放旧的出售占用
+        const m = String(e.msg || '').match(/([1-7])/)
+        const maxQ = m ? parseInt(m[1]) : 0
+        if (maxQ >= 6) {
+            clearPendingSellMode(e)
+            e.reply('红色装备、红/彩色功法不可出售哦~ 请选择 1~5')
+            return true
+        }
+        if (maxQ < 1 || maxQ > 5) {
+            setPendingSellMode(e, 'all')
+            await forceLock(e.group_id, e.user_id, 'sell')//建立出售交互(压栈选择, 不终止下层交互)
+            e.reply(`请选择要出售的品质（同时出售该品质及以下的未穿戴装备和功法书，红色装备/红彩功法不可出售）：
+1. ⚪ 白色及以下
+2. 🟢 绿色及以下
+3. 🔵 蓝色及以下
+4. 🟣 紫色及以下
+5. 🟡 黄色/金色及以下
+直接回复数字选择~（去逛街/换装等会取消出售）`)
+            return true
+        }
+        clearPendingSellMode(e)
+        const id = e.user_id
+        const filename = `${e.group_id}.json`
+        const bag = getBag(id, e.group_id)
+        const items = bag.items || {}
+        let total = 0
+        const sold = []//{kind,name,count,price}
+        for (const name of Object.keys(items)) {
+            const equip = EQUIP_TPL[name]
+            const gongfa = GONGFA_TPL[name]
+            if (equip) {
+                if ((equip.quality || 0) > maxQ) continue
+                const it = items[name]
+                const groups = (it.list && it.list.length) ? it.list.slice() : [{ count: it.count, attr: it.attr }]
+                let cnt = 0; let sub = 0
+                const remain = []//红装组保留
+                for (const g of groups) {
+                    const count = Number(g.count) || 0
+                    const p = equipSellPrice(name, g.attr)
+                    if (p <= 0) { remain.push({ count, attr: g.attr }); continue }
+                    sub += p * count
+                    cnt += count
+                }
+                if (cnt <= 0) continue
+                total += sub
+                sold.push({ kind: 'equip', name, count: cnt, price: sub })
+                if (remain.length) {
+                    it.list = remain
+                    it.count = remain.reduce((s, g) => s + g.count, 0)
+                    it.attr = remain[0].attr
+                } else delete items[name]
+            } else if (gongfa) {
+                if ((gongfa.quality || 0) > maxQ) continue
+                const p = gongfaSellPrice(name)
+                if (p <= 0) continue//红/彩功法(0价)不卖
+                const cnt = Number(items[name].count) || 0
+                if (cnt <= 0) continue
+                total += p * cnt
+                sold.push({ kind: 'gongfa', name, count: cnt, price: p * cnt })
+                delete items[name]
+            }
+        }
+        if (!sold.length) {
+            e.reply('背包里没有可出售的装备或功法书~（已穿戴的不卖，红装/红彩功法不可出售）')
+            return true
+        }
+        const homejson = await xujing_data.getQQYUserHome(id, null, filename, false)
+        /* 修仙世界: 一键出售按所在大区动态税率扣税(税收计入宗门繁荣度) */
+        const world = getWorld(e.group_id)
+        const loc = getLoc(world, id)
+        const rate = taxFor(world, loc, playerSectName(e.group_id, id))
+        const tax = Math.floor(total * rate / 100)
+        const sellNet = total - tax
+        homejson[id].money = (Number(homejson[id].money) || 0) + sellNet
+        await xujing_data.getQQYUserHome(id, homejson, filename, true)
+        addTax(world, loc, tax)
+        saveWorld(world)
+        saveBag(id, bag, e.group_id)
+        await unlock(e.group_id, e.user_id, 'sell')//出售完成释放交互占用
+        const boss = bossOf(world, loc)
+        const owner = boss ? `${REGIONS[loc].name}${boss}` : `${REGIONS[loc].name}各占领宗门`
+        const lines = sold.map(s => {
+            const tpl = s.kind === 'equip' ? EQUIP_TPL[s.name] : GONGFA_TPL[s.name]
+            const q = QUALITY[tpl.quality]
+            return s.kind === 'equip'
+                ? `${q.icon}${s.name} ×${s.count}（${Math.floor(s.price * (100 - rate) / 100)}灵石）`
+                : `${q.icon}《${s.name}》 ×${s.count}（${Math.floor(s.price * (100 - rate) / 100)}灵石）`
+        })
+        /* 结算文本渲染成图片(失败回退纯文本) */
+        const sellText = `💰 一键出售成功！装备和功法书共获得 ${sellNet} 灵石（税率 ${rate}%，扣税 ${tax} 灵石，上交${owner}）：\n${lines.join('\n')}`
+        let sellImg = null
+        try { sellImg = await textToImg(sellText) } catch (err) { }
+        if (sellImg) e.reply([segment.at(id), sellImg])
+        else e.reply([segment.at(id), `\n${sellText}`])
+        return true
+    }
+
     /** #一键出售 N: 出售 N 品质(1白 2绿 3蓝 4紫 5黄)及以下的未穿戴装备换成灵石; 红色(6)不可出售 */
     async sellEquip(e) {
         await unlock(e.group_id, e.user_id, 'sell')//先释放旧的出售占用
+        clearPendingSellMode(e)
         const m = String(e.msg || '').match(/([1-6])/)
         const maxQ = m ? parseInt(m[1]) : 0
         if (maxQ === 6) {
