@@ -280,3 +280,34 @@ test('无围剿者时溜走队成功突围带走战果', async () => {
   assert.equal(st.teams.weak, undefined, '溜走队提前结算离场')
   rm(`${WORLD_DIR}/fake_${gid}.json`)
 })
+
+test('出口围剿搜刮: 单件物品也应被搜走, 不能只剩灵石', async () => {
+  const gid = 'testambush0005'
+  writeFakeRoster(gid, {
+    强者: { name: '强者', alive: true, level: 100 },
+    弱者: { name: '弱者', alive: true, level: 1 }
+  })
+  const st = _test.emptyRealm()
+  st.gid = gid
+  st.realmId = 'r5'
+  st.ambushChoiceEnd = 0
+  st.teams = {
+    strong: { id: 'strong', kind: 'fake', name: '围剿强队', leader: '强者', members: ['强者'], ambush: 'fight', pool: [], injured: 0 },
+    weak: { id: 'weak', kind: 'fake', name: '溜走弱队', leader: '弱者', members: ['弱者'], ambush: 'flee', pool: [{ name: '修为丹', count: 1 }, { name: '星霜草', count: 1 }, { name: '灵石', count: 200, currency: true, quality: 1 }], injured: 0 }
+  }
+
+  const origRandom = Math.random
+  Math.random = () => 0.9 // 战力悬殊胜负确定, 弱队溜走必被抓
+  const msgs = await processAmbushRound(st, gid, Date.now())
+  Math.random = origRandom
+
+  const joined = msgs.join('\n')
+  assert.ok(joined.includes('溜走时被围剿方拦截'), '弱溜走队应被抓: ' + joined)
+  const strongPool = st.teams.strong?.pool || []
+  assert.ok(strongPool.some(x => x.name === '修为丹' && x.count >= 1), '单件修为丹应被搜刮走: ' + JSON.stringify(strongPool))
+  assert.ok(strongPool.some(x => x.name === '星霜草' && x.count >= 1), '单件星霜草应被搜刮走: ' + JSON.stringify(strongPool))
+  assert.ok(strongPool.some(x => x.name === '灵石' && x.count >= 1), '灵石应被搜刮走: ' + JSON.stringify(strongPool))
+  assert.equal(st.teams.weak, undefined, '被抓的溜走队被遣返移除')
+  rm(`${WORLD_DIR}/fake_${gid}.json`)
+})
+

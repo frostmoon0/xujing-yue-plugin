@@ -1557,7 +1557,8 @@ async function ambushPower (gid, team) {
 function takePoolShare (team, rate) {
   const items = []; let money = 0; const kept = []
   for (const item of team.pool || []) {
-    const n = Math.min(item.count || 0, Math.max(0, Math.floor((item.count || 0) * rate)))
+    /* 与 extractPoolShare 一致: 单个不可拆分物品也向上取整整件搜走, 否则搜刮只剩灵石 */
+    const n = Math.min(item.count || 0, Math.max(0, Math.ceil((item.count || 0) * rate)))
     if (n > 0) { const x = { ...item, count: n }; if (item.currency) money += n; else items.push(x) }
     const left = (item.count || 0) - n
     if (left > 0) kept.push({ ...item, count: left })
