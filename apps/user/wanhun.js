@@ -50,7 +50,7 @@ export class wanhun extends plugin {
         { reg: '^[#＃]?喂养主魂\\s*(\\d+)$', fnc: 'feedMainSoul' },
         { reg: '^[#＃]?喂养副魂\\s*(\\d+)\\s*(\\d+)$', fnc: 'feedDeputySoul' },
         { reg: '^[#＃]?万魂幡状态$', fnc: 'wanhunStatus' },
-        { reg: '^[#＃]?万魂幡玩法$', fnc: 'wanhunGuide' },
+        { reg: '^[#＃]?(万魂幡玩法|万魂窟玩法|万魂幡说明|万魂幡攻略|万魂窟说明)$', fnc: 'wanhunGuide' },
         { reg: '^[#＃]?[0-9]+$', fnc: 'pick' }
       ]
     })
@@ -318,14 +318,27 @@ export class wanhun extends plugin {
   }
 
   async wanhunGuide (e) {
-    const text = Wanhun.guideText()
-    try {
-      const img = await textToImg(text)
-      if (img) {
-        e.reply(img)
-        return true
+    /* 完整玩法说明约2800字，单条消息在部分协议端会因长度返回422；拆成小段逐条发送。 */
+    const pages = []
+    let current = ''
+    for (const line of Wanhun.guideText().split('\n')) {
+      if (current && current.length + line.length + 1 > 600) {
+        pages.push(current)
+        current = ''
       }
-    } catch (err) { }
-    return reply(e, text)
+      current = current ? `${current}\n${line}` : line
+    }
+    if (current) pages.push(current)
+    for (const page of pages) {
+      try {
+        await e.reply(page)
+      } catch (err) {
+        /* 单段仍被协议端拒绝时继续拆小，避免回退发送整篇再次触发422。 */
+        for (let i = 0; i < page.length; i += 300) {
+          try { await e.reply(page.slice(i, i + 300)) } catch (splitErr) { }
+        }
+      }
+    }
+    return true
   }
 }

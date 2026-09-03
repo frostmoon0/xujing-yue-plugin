@@ -86,7 +86,7 @@ export class xujing_help extends plugin {
       },
       {
         name: '万魂幡', icon: itemIcon('万魂幡'), qCls: 'q7',
-        attr: '法宝：成长型收魂神兵(百鬼助战/聚魂护体/可进阶至九阶)',
+        attr: '法宝：装备后收魂、主/副魂战力生效；可祭出百鬼助战/聚魂护体，最高九阶',
         source: `#打造万魂幡(${itemIcon('万魂幡残卷')}万魂幡残卷×5+🌈成长性特殊彩武×1+${itemIcon('阴魂砂')}阴魂砂×20+${itemIcon('游魂骨')}游魂骨×20)`,
         sourceCls: ''
       },
