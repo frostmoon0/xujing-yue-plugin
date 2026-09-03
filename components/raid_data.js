@@ -176,9 +176,11 @@ const GOLD_GF = byQ(GONGFA_TPL, 5)
 const RED_GF = byQ(GONGFA_TPL, 6)
 export const COLOR_GF = ['太阴月华诀']
 const WANHUN_ONLY_MATS = new Set(['万魂幡残卷', '阴魂砂', '游魂骨', '鬼火草', '幽冥木', '摄魂铁', '阴魂石', '玄阴玉', '镇魂晶', '血煞髓', '万魂帝晶'])
+/* 功法残卷是分解重复傀儡术的专属材料，不属于藏宝阁可抢战利品。 */
+const RAID_EXCLUDED_MATS = new Set([...WANHUN_ONLY_MATS, '功法残卷'])
 /* 妖丹只由世界Boss掉落, 不加入藏宝阁奖励池 */
 const YAODAN_MATS = new Set(['一阶妖丹', '二阶妖丹', '三阶妖丹', '四阶妖丹', '五阶妖丹', '六阶妖丹', '七阶妖丹'])
-const regularByQ = (tpl, q) => byQ(tpl, q).filter(name => !WANHUN_ONLY_MATS.has(name) && !YAODAN_MATS.has(name))
+const regularByQ = (tpl, q) => byQ(tpl, q).filter(name => !RAID_EXCLUDED_MATS.has(name) && !YAODAN_MATS.has(name))
 const MID_MAT = [].concat(regularByQ(MATERIAL_TPL, 4), regularByQ(MATERIAL_TPL, 5))
 const RED_MAT = regularByQ(MATERIAL_TPL, 6).filter(name => !ARRAY_MATS.includes(name))
 /* 万魂窟专属材料只从万魂窟产出，不加入藏宝阁奖励池。 */

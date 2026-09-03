@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { fmtItem, fmtItems, itemIcon } from '../components/equip_data.js'
-import { lootIcon } from '../components/raid_data.js'
+import { lootIcon, COLOR_MATS } from '../components/raid_data.js'
 
 test('物品展示统一带对应图标', () => {
   assert.equal(itemIcon('冥蝶手'), '🔴')
@@ -19,4 +19,8 @@ test('物品列表中的每个名称都带图标', () => {
   assert.equal(fmtItem('冥蝶手', 3), '🔴冥蝶手×3')
   assert.equal(fmtItems({ 冥蝶手: 3, 聚宝功: 5, 月魄石: 4 }), '🔴冥蝶手×3、🟡聚宝功×5、🟣月魄石×4')
   assert.equal(lootIcon('凝露丹'), '🌸')
+})
+
+test('功法残卷不进入藏宝阁彩色材料池', () => {
+  assert.equal(COLOR_MATS.includes('功法残卷'), false)
 })
