@@ -7,8 +7,10 @@ import {
   PUPPET_MAX_POWER,
   PUPPET_PASSIVES,
   PUPPET_CHAPTERS,
+  PUPPET_TECHNIQUE_FRAGMENT,
   PUPPET_DEPLOY_COST_PER_RANK,
   puppetDeployCost,
+  parsePuppetTechniqueDismantleCmd,
   rollPuppetPower,
   puppetChapterForRank,
   resolvePuppet,
@@ -17,7 +19,7 @@ import {
   takePuppetCore,
   _test
 } from '../components/puppet_data.js'
-import { ensureBagShape, addItemToBag } from '../components/equip_data.js'
+import { ensureBagShape, addItemToBag, MATERIAL_TPL, itemIcon } from '../components/equip_data.js'
 import { COLOR_SPECIAL, realmSpecialPool, rollRealmSpecialReward } from '../components/realm_data.js'
 
 test('傀儡每阶消耗对应阶数的妖丹与五个万阵核心', () => {
@@ -37,6 +39,19 @@ test('傀儡祭出费用按阶位递增, 每升一阶增加一万灵石', () => 
   assert.equal(puppetDeployCost(99), 70000)
 })
 
+
+test('傀儡术分解指令兼容有无空格并解析数量', () => {
+  assert.deepEqual(parsePuppetTechniqueDismantleCmd('#分解傀儡术 傀儡术下篇 3'), { name: '傀儡术下篇', amount: 3 })
+  assert.deepEqual(parsePuppetTechniqueDismantleCmd('#分解傀儡术下篇3'), { name: '傀儡术下篇', amount: 3 })
+  assert.deepEqual(parsePuppetTechniqueDismantleCmd('分解傀儡术 中篇'), { name: '傀儡术中篇', amount: 1 })
+  assert.equal(parsePuppetTechniqueDismantleCmd('#分解傀儡术'), null)
+  assert.equal(PUPPET_TECHNIQUE_FRAGMENT, '功法残卷')
+  assert.equal(MATERIAL_TPL[PUPPET_TECHNIQUE_FRAGMENT].quality, 7)
+  assert.equal(itemIcon(PUPPET_TECHNIQUE_FRAGMENT), '🌈')
+  const bag = { items: {} }
+  addItemToBag(bag, PUPPET_TECHNIQUE_FRAGMENT, 3, null, false)
+  assert.equal(bag.items[PUPPET_TECHNIQUE_FRAGMENT].count, 3)
+})
 
 test('傀儡术按篇章开放阶位', () => {
   assert.equal(puppetChapterForRank(1), '傀儡术下篇')

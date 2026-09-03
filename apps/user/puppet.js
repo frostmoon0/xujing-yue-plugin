@@ -3,7 +3,7 @@ import {
   PUPPET_CHAPTERS, PUPPET_PASSIVES, PUPPET_PASSIVE_KEYS, PUPPET_PASSIVE_CORE,
   puppetPanel as getPuppetPanel, puppetCorePanel, puppetCoreCount, puppetTechniquePanel, availablePassiveLines,
   craftPuppet, upgradePuppet, renamePuppet, equipPuppet, unequipPuppet,
-  deployPuppet, recallPuppet, dismantlePuppet, dismantlePuppetTechnique,
+  deployPuppet, recallPuppet, dismantlePuppet, dismantlePuppetTechnique, parsePuppetTechniqueDismantleCmd,
   getPuppets, resolvePuppet
 } from '../../components/puppet_data.js'
 import { getBag, getLearnedGongfa, itemIcon } from '../../components/equip_data.js'
@@ -35,7 +35,7 @@ export class puppet extends plugin {
         { reg: '^[#＃]?分解傀儡\\s+\\S+$', fnc: 'dismantle' },
         { reg: '^[#＃]?祭出傀儡$', fnc: 'deploy' },
         { reg: '^[#＃]?收回傀儡$', fnc: 'recall' },
-        { reg: '^[#＃]?分解傀儡术\\s+\\S+(?:\\s+\\d+)?$', fnc: 'dismantleTechnique' },
+        { reg: '^[#＃]?分解傀儡术.*$', fnc: 'dismantleTechnique' },
         { reg: '^[#＃]?[0-9]+$', fnc: 'pick' }
       ]
     })
@@ -44,7 +44,7 @@ export class puppet extends plugin {
   async puppetPanel (e) {
     const tech = await puppetTechniquePanel(e.user_id)
     const p = getPuppetPanel(e.user_id, e.group_id)
-    const text = `${tech}\n\n${p.text}\n\n指令：#打造傀儡 · #装备傀儡 序号/名字 · #升级傀儡 [序号/名字] · #祭出傀儡\n#傀儡命名 序号 名字 · #分解傀儡 序号 · #收回傀儡 · #卸下傀儡\n重复功法：#分解傀儡术 傀儡术下篇 数量`
+    const text = `${tech}\n\n${p.text}\n\n指令：#打造傀儡 · #装备傀儡 序号/名字 · #升级傀儡 [序号/名字] · #祭出傀儡\n#傀儡命名 序号 名字 · #分解傀儡 序号 · #收回傀儡 · #卸下傀儡\n重复功法：#分解傀儡术下篇 [数量]（中篇/上篇同理）`
     try {
       const img = await textToImg(text)
       if (img) { e.reply(img); return true }
@@ -122,9 +122,9 @@ export class puppet extends plugin {
   async recall (e) { return reply(e, recallPuppet(e.user_id, e.group_id).msg) }
 
   async dismantleTechnique (e) {
-    const m = String(e.msg || '').match(/^[#＃]?分解傀儡术\s+(\S+)(?:\s+(\d+))?$/)
-    if (!m) return false
-    const ret = await dismantlePuppetTechnique(e.user_id, e.group_id, m[1], m[2] ? Number(m[2]) : 1)
+    const parsed = parsePuppetTechniqueDismantleCmd(e.msg)
+    if (!parsed) return reply(e, '用法：#分解傀儡术 <下篇/中篇/上篇> [数量]，例如 #分解傀儡术下篇 1')
+    const ret = await dismantlePuppetTechnique(e.user_id, e.group_id, parsed.name, parsed.amount)
     return reply(e, ret.msg)
   }
 

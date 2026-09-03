@@ -14,6 +14,14 @@ export const PUPPET_TECHNIQUES = {
 }
 
 export const PUPPET_CHAPTERS = ['傀儡术下篇', '傀儡术中篇', '傀儡术上篇']
+export const PUPPET_TECHNIQUE_FRAGMENT = '功法残卷'
+
+/** 解析重复傀儡术分解指令，兼容“分解傀儡术下篇”和“分解傀儡术 傀儡术下篇”。 */
+export function parsePuppetTechniqueDismantleCmd (msg) {
+  const m = String(msg || '').trim().match(/^[#＃]?分解傀儡术\s*(?:傀儡术)?(下篇|中篇|上篇)(?:\s*(\d+))?$/)
+  if (!m) return null
+  return { name: `傀儡术${m[1]}`, amount: m[2] ? Math.max(1, Number(m[2]) || 1) : 1 }
+}
 
 /** 傀儡品质与功法篇章的解锁关系: 下篇1~2阶, 中篇3~5阶, 上篇6~7阶。 */
 export const PUPPET_RANK_NAMES = ['', '一阶', '二阶', '三阶', '四阶', '五阶', '六阶', '七阶']
@@ -536,8 +544,9 @@ export async function dismantlePuppetTechnique (uid, gid = 'global', name, amoun
   const count = Math.max(1, Math.min(have, Math.floor(Number(amount) || 1)))
   if (have < 1) return { ok: false, msg: `你没有多余的${itemIcon(name)}《${name}》功法书。` }
   if (!consumeBagItem(bag, name, count)) return { ok: false, msg: '功法书状态已变化，请稍后再试。' }
+  addItemToBag(bag, PUPPET_TECHNIQUE_FRAGMENT, count, null, false)
   saveBag(uid, bag, gid)
-  return { ok: true, msg: `📜已分解${itemIcon(name)}《${name}》×${count}，得功法残卷。` }
+  return { ok: true, msg: `📜已分解${itemIcon(name)}《${name}》×${count}，获得${itemIcon(PUPPET_TECHNIQUE_FRAGMENT)}${PUPPET_TECHNIQUE_FRAGMENT}×${count}。` }
 }
 
 export function puppetPanel (uid, gid = 'global') {
@@ -621,6 +630,7 @@ export const _test = {
 export default {
   PUPPET_TECHNIQUES,
   PUPPET_CHAPTERS,
+  PUPPET_TECHNIQUE_FRAGMENT,
   PUPPET_INITIAL_COST,
   PUPPET_UPGRADE_COSTS,
   PUPPET_PASSIVES,

@@ -291,8 +291,9 @@ export const MATERIAL_TPL = {
   '乾坤阵晶': { type: 'special', quality: 6 },
   '太虚阵砂': { type: 'special', quality: 6 },
   '九幽阵髓': { type: 'special', quality: 6 },
-  // —— 傀儡分解材料(彩色品质7): 分解傀儡固定返还1枚，可用于打造时自选被动 ——
+  // —— 傀儡/功法分解材料(彩色品质7) ——
   '傀儡被动晶核': { type: 'special', quality: 7, bound: true },
+  '功法残卷': { type: 'special', quality: 7, bound: true },
   // —— 妖丹(品质对应阶数 1~7): 世界Boss掉落, 傀儡打造/每阶升级所需材料 ——
   '一阶妖丹': { type: 'special', quality: 1 },
   '二阶妖丹': { type: 'special', quality: 2 },
@@ -523,6 +524,7 @@ export function getItemSource(name) {
     if (['天衍阵纹', '乾坤阵晶', '太虚阵砂', '九幽阵髓'].includes(name)) return '遗蜕秘境/每日秘境/藏宝阁洗劫掉落（红色阵法材料）'
     if (isYaodan(name)) return '世界Boss掉落（每只Boss掉1枚，归伤害最高者；1/2/3/4档Boss分别出1~3/2~4/3~6/6~7阶）'
     if (name === '傀儡被动晶核') return '分解傀儡固定返还1枚 · #傀儡晶核 查看'
+    if (name === '功法残卷') return '分解重复傀儡术篇章获得 · #分解傀儡术 <篇章> [数量]'
     return '虚境秘境探索(药材/矿物)'
   }
   if (ITEM_TPL[name]) {
