@@ -169,20 +169,26 @@ export class xujing_help extends plugin {
       sourceCls: ''
     })
     groups.push({ title: '🕯️ 万魂窟材料（白~彩 · 西域万魂窟专属）', list: wanhunList })
-    /* 妖丹(品质对应阶数, 世界Boss掉落): 傀儡打造/升级材料, 单独一组 */
-    const yaodanList = [1, 2, 3, 4, 5, 6, 7].map(q => {
+    /* 残丹+妖丹(品质对应阶数): 妖丹=世界Boss掉落/残丹凝练; 残丹仅遗蜕秘境掉落, 傀儡打造/升级材料同组 */
+    const yaodanList = [{
+      name: '残丹', icon: itemIcon('残丹'), qCls: 'q1',
+      attr: '品质白色 · 凝练妖丹的材料(5个合成1颗随机品质妖丹)',
+      source: '仅遗蜕秘境(公开/专属)探索掉落 · #合成妖丹',
+      sourceCls: ''
+    }]
+    for (const q of [1, 2, 3, 4, 5, 6, 7]) {
       const qd = QUALITY[q] || { icon: '', name: '品质' }
       const name = yaodanName(q)
-      return {
+      yaodanList.push({
         name,
         icon: itemIcon(name),
         qCls: `q${q}`,
         attr: `品质${qd.name} · 傀儡打造/升级材料`,
-        source: '世界Boss掉落(每只Boss掉1枚,归伤害最高者;1/2/3/4档分别出1~3/2~4/3~6/6~7阶)',
+        source: '世界Boss掉落(每只Boss掉1枚,归伤害最高者;1/2/3/4档分别出1~3/2~4/3~6/6~7阶) · 或5个残丹#合成妖丹随机凝练',
         sourceCls: ''
-      }
-    })
-    groups.push({ title: '🎖️ 妖丹（世界Boss掉落 · 傀儡打造/升级材料）', list: yaodanList })
+      })
+    }
+    groups.push({ title: '🎖️ 妖丹（世界Boss掉落 · 5残丹可#合成妖丹）', list: yaodanList })
     const bg = await rodom()
     const resPath = `../../../../../plugins/${Plugin_Name}/resources/`
     const img = await puppeteer.screenshot(`${Plugin_Name}/itemlist/index`, {

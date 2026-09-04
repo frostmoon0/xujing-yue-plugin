@@ -6,7 +6,7 @@ import { Plugin_Name, Plugin_Path } from '../../components/plugin.js'
 import xujing_data from '../../components/xujing_data.js'
 import Yanghun from '../../components/yanghun_data.js'
 import { DEPLOY_MATS } from '../../components/dynasty_data.js'
-import { addItem, addItemToBag, consumeItem, consumeBagItem, getBag, getItemAttr, saveBag, hasDingxianyou, ITEM_TPL, MATERIAL_TPL, QUALITY, EQUIP_TPL, rollEquipAttr, rollRandomColorEquip, fmtAttr, ownedRedWeapons, craftRainbow, renameRainbow, rainbowInfoLines, itemIcon } from '../../components/equip_data.js'
+import { addItem, addItemToBag, consumeItem, consumeBagItem, getBag, getItemAttr, saveBag, hasDingxianyou, ITEM_TPL, MATERIAL_TPL, QUALITY, EQUIP_TPL, rollEquipAttr, rollRandomColorEquip, fmtAttr, ownedRedWeapons, craftRainbow, renameRainbow, rainbowInfoLines, itemIcon, yaodanName, rollYaodanTierFromRemnant } from '../../components/equip_data.js'
 import { forceLock, isCurrent, unlock } from '../../components/interact.js'
 import { guardActionLocked } from '../../components/action_lock.js'
 import { PUPPET_INITIAL_COST, PUPPET_UPGRADE_COSTS } from '../../components/puppet_data.js'
@@ -123,6 +123,11 @@ export class MIX extends plugin {
             {
                 reg: '^[#＃]?(我的彩武|彩武信息|我的神兵|神兵信息|七彩神兵信息)$',
                 fnc: 'rainbowInfo'
+            },
+            {
+                // 残丹凝练妖丹: 5个残丹合成1颗随机品质(1~7阶)妖丹, 数量可省略(默认1)
+                reg: '^[#＃]?(合成妖丹|凝炼妖丹|凝聚妖丹)\\s*(\\d+)?\\s*$',
+                fnc: 'craftYaodan'
             },
             {
                 // 打造彩装材料选择数字; 无待选状态时放行给其他插件
@@ -291,6 +296,37 @@ export class MIX extends plugin {
         for (const mat of recipe.mats) consumeItem(id, mat.name, mat.count * want, null, e.group_id)
         addItem(id, pillName, want, null, e.group_id)
         e.reply(`🧪 合成成功！消耗 ${recipe.mats.map(mat => `${QUALITY[MATERIAL_TPL[mat.name].quality].icon}${mat.name}×${mat.count * want}`).join(' + ')}，获得 ${ITEM_TPL[pillName].icon}${pillName}×${want}（${ITEM_TPL[pillName].desc}）`)
+        return true
+    }
+
+    /** #合成妖丹 [数量]: 5个残丹 → 1颗随机品质妖丹(低阶更常见), 默认1颗上限99颗 */
+    async craftYaodan(e) {
+        const id = e.user_id
+        const gid = e.group_id
+        const numM = String(e.msg || '').match(/(\d+)/)
+        const want = numM ? Math.min(99, Math.max(1, parseInt(numM[1], 10))) : 1
+        const need = want * 5
+        /* 单次读档内校验+扣除+入包, 一次保存(参照制造红装原子写法, 避免逐次读改写) */
+        const bag = getBag(id, gid)
+        const have = (bag.items && bag.items['残丹'] && bag.items['残丹'].count) || 0
+        if (have < need) {
+            e.reply(`材料不足！合成${want}颗妖丹需要 ${itemIcon('残丹')}残丹×${need}（你持有 ${have}）\n残丹只在遗蜕秘境(公开/专属)探索掉落~`)
+            return true
+        }
+        if (!consumeBagItem(bag, '残丹', need)) {
+            e.reply('材料状态已变化，请重新检查背包后再合成~')
+            return true
+        }
+        const got = {}
+        for (let i = 0; i < want; i++) {
+            const tier = rollYaodanTierFromRemnant()
+            const name = yaodanName(tier)
+            got[name] = (got[name] || 0) + 1
+        }
+        for (const [name, count] of Object.entries(got)) addItemToBag(bag, name, count, null, false)
+        saveBag(id, bag, gid)
+        const gotTxt = Object.entries(got).map(([name, count]) => `${itemIcon(name)}${name}×${count}`).join('、')
+        e.reply(`🧪 凝练成功！消耗 ${itemIcon('残丹')}残丹×${need}，获得 ${gotTxt}${want > 1 ? '' : '（5残丹=1颗随机品质妖丹，低阶更常见~）'}`)
         return true
     }
 

@@ -301,7 +301,9 @@ export const MATERIAL_TPL = {
   '四阶妖丹': { type: 'special', quality: 4 },
   '五阶妖丹': { type: 'special', quality: 5 },
   '六阶妖丹': { type: 'special', quality: 6 },
-  '七阶妖丹': { type: 'special', quality: 7 }
+  '七阶妖丹': { type: 'special', quality: 7 },
+  // —— 残丹(白色品质1): 仅遗蜕秘境掉落; 5个可 #合成妖丹 随机凝成随机品质妖丹 ——
+  '残丹': { type: 'special', quality: 1 }
 }
 
 /** 万魂窟专属材料: 仅由西域万魂窟掉落, 普通秘境/灵宝盒/藏宝阁不得产出 */
@@ -316,6 +318,20 @@ export function yaodanName (tier) {
 /** 是否妖丹材料 */
 export function isYaodan (name) {
   return typeof name === 'string' && name.endsWith('阶妖丹')
+}
+
+/** 残丹凝练妖丹的阶位权重(低阶更常见, 合计100): 仅遗蜕秘境产出的残丹5个可#合成妖丹 */
+export const YAODAN_REMNANT_WEIGHTS = { 1: 28, 2: 24, 3: 18, 4: 12, 5: 9, 6: 6, 7: 3 }
+/** 按权重随机一个妖丹阶位(1~7), random 可注入以便单测 */
+export function rollYaodanTierFromRemnant (random = Math.random) {
+  const entries = Object.entries(YAODAN_REMNANT_WEIGHTS).map(([tier, weight]) => ({ tier: Number(tier), weight: Number(weight) }))
+  const total = entries.reduce((sum, item) => sum + item.weight, 0)
+  let cursor = random() * total
+  for (const item of entries) {
+    cursor -= item.weight
+    if (cursor < 0) return item.tier
+  }
+  return entries[entries.length - 1].tier
 }
 
 /** 丹药价格(灵石) */
@@ -521,8 +537,9 @@ export function getItemSource(name) {
   if (ARTIFACT_TPL[name]) return `${itemIcon('神游蛊')}神游蛊×1 + ${itemIcon('玄阴玉')}玄阴玉×5 + ${itemIcon('镇魂晶')}镇魂晶×5 + ${itemIcon('血煞髓')}血煞髓×5 合成`
   if (name === '无主幽魂') return '万魂窟探索中随机遇到幽魂 · 回复1吸收获得'
   if (MATERIAL_TPL[name]) {
+    if (name === '残丹') return '仅遗蜕秘境(公开/专属)探索掉落 · 5个可#合成妖丹随机凝成1颗随机品质妖丹'
     if (['天衍阵纹', '乾坤阵晶', '太虚阵砂', '九幽阵髓'].includes(name)) return '遗蜕秘境/每日秘境/藏宝阁洗劫掉落（红色阵法材料）'
-    if (isYaodan(name)) return '世界Boss掉落（每只Boss掉1枚，归伤害最高者；1/2/3/4档Boss分别出1~3/2~4/3~6/6~7阶）'
+    if (isYaodan(name)) return '世界Boss掉落（每只Boss掉1枚，归伤害最高者；1/2/3/4档Boss分别出1~3/2~4/3~6/6~7阶） · 或5个残丹#合成妖丹随机凝练'
     if (name === '傀儡被动晶核') return '分解傀儡固定返还1枚 · #傀儡晶核 查看'
     if (name === '功法残卷') return '分解重复傀儡术篇章获得 · #分解傀儡术 <篇章> [数量]'
     return '虚境秘境探索(药材/矿物)'
