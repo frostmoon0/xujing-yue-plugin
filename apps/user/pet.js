@@ -1,6 +1,6 @@
 /* ============================================================
  * 虚境灵兽(宠物)系统 - 指令与流程
- * #搜寻宠物 → 0~30分钟 → 遇宠(回复1抓/2放走) → 捕抓/放走
+ * #搜寻宠物/搜寻灵兽 → 0~30分钟 → 遇宠(回复1抓/2放走) → 捕抓/放走
  * #灵兽袋 / #宠物详情N / #宠物改名N / #放生N / #宠物目录 / #赠送宠物
  * 数字指令走斥驳路由(own-state + isCurrent + yield)
  * priority=50 (wanhun45 之后, equip60 之前)
@@ -25,7 +25,7 @@ import {
   petBagText, petDetailText, catalogText, releasePet, renamePet, giftPet,
   deployPet, recallPet, activePetOf, petPower, canBattle, groupPetRank,
   tickPetGroup, encounterText, guideText, stageNameOf,
-  redWindowText, rainbowWindowText
+  redWindowText, rainbowWindowText, settlePlayerSearch, PET_SEARCH_CMD_REG
 } from '../../components/pet_data.js'
 
 /* ---------- 群内@通知 / 群发 ---------- */
@@ -124,7 +124,7 @@ export class pet extends plugin {
       event: 'message',
       priority: 50,
       rule: [
-        { reg: '^[#＃]?搜寻宠物$', fnc: 'searchPet' },
+        { reg: PET_SEARCH_CMD_REG, fnc: 'searchPet' },
         { reg: '^[#＃]?(搜寻状态|搜寻进度)$', fnc: 'searchStatus' },
         { reg: '^[#＃]?(灵兽袋|宠物袋|我的灵兽|我的宠物)$', fnc: 'petBag' },
         { reg: '^[#＃]?(宠物图鉴|宠物目录|灵兽图鉴|灵兽目录|灵兽大全)(.*)$', fnc: 'petCatalog' },
@@ -153,6 +153,8 @@ export class pet extends plugin {
     const gid = String(e.group_id)
     const uid = e.user_id
     const state = getPetState(gid)
+    /* 定时器可能因重启/延迟漏掉到期点，命令进来时先惰性结算，避免旧搜寻被新指令覆盖 */
+    settlePlayerSearch(state, gid, uid)
     /* 若有未处理遇宠: 无条件抢占回复权, 玩家可重新回数字而不失灵 */
     const enc = state.encounter[uid]
     if (enc && enc.expireAt > Date.now()) {
@@ -172,6 +174,7 @@ export class pet extends plugin {
     const gid = String(e.group_id)
     const uid = e.user_id
     const state = getPetState(gid)
+    settlePlayerSearch(state, gid, uid)
     const enc = state.encounter[uid]
     if (enc && enc.expireAt > Date.now()) {
       /* 无条件抢占 'pet' 锁, 确保数字回复走本系统(遇宠数字被吃后可恢复) */

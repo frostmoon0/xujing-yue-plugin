@@ -181,6 +181,31 @@ test('玩家队遭遇优先选玩家目标(两队可互相遭遇), 无玩家队�
   assert.equal(node3.type, 'treasure')
 })
 
+test('已被其他队伍锁定的玩家队不会再次生成节点，避免双向重复遭遇', async () => {
+  const gid = 'testcollision0001'
+  const st = _test.emptyRealm()
+  st.gid = gid
+  st.phase = 'explore'
+  st.terrain = 'dongtian'
+  st.diff = 'huang'
+  st.teams = {
+    A: { id: 'A', kind: 'player', leader: '1', members: ['1'], node: null, nextActionAt: 0 },
+    B: { id: 'B', kind: 'player', leader: '2', members: ['2'], node: null, engagedBy: 'A', nextActionAt: 0 }
+  }
+  const pending = await (await import('../components/realm_data.js')).advanceTeams(st, gid, {})
+  assert.equal(pending.some(x => x.team.id === 'B'), false)
+  assert.equal(st.teams.B.node, null)
+})
+
+test('已有待处理节点的队伍不会再次成为第三队遭遇目标', () => {
+  const st = { terrain: 'dongtian', diff: 'huang', teams: {
+    A: { id: 'A', kind: 'player', members: ['1'] },
+    B: { id: 'B', kind: 'player', members: ['2'], node: { type: 'treasure' } },
+    C: { id: 'C', kind: 'player', members: ['3'] }
+  } }
+  const node = _test.buildNode(st, st.teams.C, 'player')
+  assert.notEqual(node.data.target, 'B')
+})
 test('玩家超时未回复的系统代选全部为保守选项', () => {
   assert.equal(autoPickForPlayer({ type: 'treasure' }), 2, '放弃宝物不惊动')
   assert.equal(autoPickForPlayer({ type: 'player' }), 3, '遭遇玩家队避让')

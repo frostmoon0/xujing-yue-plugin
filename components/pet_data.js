@@ -17,6 +17,7 @@ const petCache = new Map()
 const petCacheKey = (gid, kind) => `${String(gid || '')}|${normalizePetKind(kind)}`
 const MINUTE_MS = 60 * 1000
 const DAY_MS = 24 * 60 * 60 * 1000
+export const PET_SEARCH_CMD_REG = '^[#＃]?(搜寻宠物|搜寻灵兽|寻找宠物|寻找灵兽)\\s*$'
 
 /** 随机取文案(同一流程每次不必重复同一句) */
 function pickText (list) {
@@ -1194,6 +1195,20 @@ export function catalogText (state, uid, filter = '') {
   return `未找到与「${f}」相关的灵兽，试试 #宠物目录 看全貌吧~`
 }
 
+export function settlePlayerSearch (state, gid, uid, now = Date.now()) {
+  let changed = false
+  const enc = state.encounter[uid]
+  if (enc && enc.expireAt <= now) {
+    unlockWindow(state, enc)
+    delete state.encounter[uid]
+    changed = true
+  }
+  const search = state.search[uid]
+  if (search && search.readyAt <= now) return rollEncounter(state, gid, uid, now)
+  if (changed) savePetState(state)
+  return null
+}
+
 /* ============================================================
  * 每分钟推进(纯逻辑, 返回通知, 由应用层发送)
  * ============================================================ */
@@ -1235,7 +1250,7 @@ export function guideText () {
     '· 灵兽 = 血脉 × 物种。血脉定品质（白/绿/蓝/紫/金/红/彩）与属性倾向；物种定形态、大区与繁殖。',
     '· 每只灵兽属性随机（同种两只亦各不相同），捕获时定死满成长资质，破壳/成长不改变。',
     '',
-    '【搜寻】#搜寻宠物',
+    '【搜寻】#搜寻宠物 / #搜寻灵兽',
     '· 在所在大区觅兽，0~30 分钟自有分晓；宠物池 = 所在大区 + 混池。',
     '· #搜寻状态 观进度；遇宠后回复 1 捕获 / 2 放走。',
     '',

@@ -806,7 +806,7 @@ function deterministicFightResult (win) {
   }))
   return { myWin: win ? 3 : 0, oppWin: win ? 0 : 3, rounds, winner: win ? 'me' : 'opp' }
 }
-function activeTeams (st, self) { return Object.values(st.teams).filter(t => t.id !== self.id && t.entered !== false && !t.dead && !t.engagedBy && (t.members || []).length) }
+function activeTeams (st, self) { return Object.values(st.teams).filter(t => t.id !== self.id && t.entered !== false && !t.dead && !t.engagedBy && !t.node && (t.members || []).length) }
 /** 遭遇目标: 优先选玩家队伍(PvP 遭遇), 没有玩家队时才选伪玩家队; 保持确定性(按 id 排序后取首个) */
 function targetTeam (st, self) {
   const actives = activeTeams(st, self).sort((a, b) => String(a.id).localeCompare(String(b.id)))
@@ -821,7 +821,7 @@ function buildNode (st, team, type, teamPower = Math.max(1, Number(team.combatPo
   } else if (type === 'dushi') {
     node.title = '🎲 石坊赌源'; node.text = '一块品相不明的源石横在面前，切法决定固定收益。'; node.data = { kind: 'gamble' }; node.choices = [{ n: 1, label: '切中品源石（获得一份稳定奖励）' }, { n: 2, label: '切天价源石（获得一份高阶奖励并增加乱源）' }, { n: 3, label: '不切' }]
   } else if (type === 'fake') {
-    const candidates = Object.values(st.teams).filter(t => t.kind === 'fake' && t.entered !== false && t.members.length && !t.dead && !t.engagedBy && t.id !== team.id).sort((a, b) => String(a.id).localeCompare(String(b.id))); const target = candidates[0]
+    const candidates = Object.values(st.teams).filter(t => t.kind === 'fake' && t.entered !== false && t.members.length && !t.dead && !t.engagedBy && !t.node && t.id !== team.id).sort((a, b) => String(a.id).localeCompare(String(b.id))); const target = candidates[0]
     if (!target) return buildNode(st, team, 'treasure')
     target.engagedBy = team.id
     node.title = '🧙 遭遇伪玩家'; node.text = `前方出现【${target.name}】的队伍！`; node.data = { kind: 'fight', target: target.id, victim: target.members.slice().sort()[0] }; node.choices = [{ n: 1, label: '出手（胜后选择杀/搜刮）' }, { n: 2, label: '买路（300灵石）' }, { n: 3, label: '绕道' }]
@@ -1319,7 +1319,7 @@ export async function advanceTeams (st, gid, cfg) {
   if (st.phase !== 'explore') return []
   const now = Date.now(); const pending = []
   for (const t of Object.values(st.teams)) {
-    if (t.dead || !t.members.length || t.node || now < (t.nextActionAt || 0)) continue
+    if (t.dead || !t.members.length || t.node || t.engagedBy || now < (t.nextActionAt || 0)) continue
     if (t.kind === 'fake') continue
     /* 转让队长后刷新队长快照: 节点推送给当前队长, 旧队长离开也不卡队 */
     syncPlayerTeam(st, gid, t)
@@ -1353,7 +1353,7 @@ export async function driveFakeTeams (st, gid, cfg) {
   if (st.phase !== 'explore') return { msgs: [], pushes: [] }
   const now = Date.now(); const msgs = []; const pushes = []
   for (const t of Object.values(st.teams)) {
-    if (t.kind !== 'fake' || t.entered === false || t.dead || !t.members.length) continue
+    if (t.kind !== 'fake' || t.entered === false || t.dead || t.engagedBy || !t.members.length) continue
     syncFakeTeam(gid, st, t)
     if (!t.members.length) { t.dead = true; continue }
     if (Array.isArray(t.eventQueue) && t.eventQueue.length) {

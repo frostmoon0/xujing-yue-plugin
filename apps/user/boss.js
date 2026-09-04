@@ -9,8 +9,8 @@ import schedule from 'node-schedule'
 import { textToImg } from '../../components/common-lib/reply-img.js'
 import { addItem, tryGiveSecretKey, itemIcon } from '../../components/equip_data.js'
 import {
-  getBoss, saveBoss, activeBossGroups, isNight, spawnBoss, attackHit, distributeLoot,
-  startToken, firstGrab, stealGrab, settleToken, GRAB_CD,
+  getBoss, saveBoss, activeBossGroups, isNight, spawnBoss, scheduleBossSoon, attackHit, distributeLoot,
+  startToken, firstGrab, stealGrab, settleToken, GRAB_CD, BOSS_SOON_DELAY,
   addAutoAtk, delAutoAtk,
   MAX_SPAWN_PER_CYCLE, CYCLE_MS, BCAST_MIN,
   FLEE_MIN, FIRST_SPAWN_MIN, NEXT_SPAWN_MIN, ATTACK_CD,
@@ -92,6 +92,7 @@ export class boss extends plugin {
         { reg: '^(@[^\\s#＃@]+)?\\s*[#＃]?\\s*(抢夺登仙令|抢登仙令)(\\s*@.*)?$', fnc: 'grabToken' },
         { reg: '^[#＃]?(攻击boss|攻打boss|讨伐boss|围殴boss|打boss)$', fnc: 'attackBoss' },
         { reg: '^[#＃]?(停止攻击|停止讨伐|退出讨伐|停止打boss)$', fnc: 'stopAutoAtk' },
+        { reg: '^[#＃]?(boss刷新|刷新boss|boss一会刷新)$', fnc: 'scheduleBoss', auth: 'master' },
         { reg: '^[#＃]?(boss状态|Boss状态|世界boss|boss详情)$', fnc: 'bossStatus' }
       ]
     })
@@ -102,6 +103,19 @@ export class boss extends plugin {
     }
   }
 
+  /* ---- #boss刷新: 主人安排当前群下一只Boss约1分钟后出现 ---- */
+  async scheduleBoss (e) {
+    if (!e.group_id) { e.reply('需在群内安排刷新~'); return true }
+    const gid = String(e.group_id)
+    const st = getBoss(gid)
+    if (!scheduleBossSoon(st, BOSS_SOON_DELAY)) {
+      e.reply(st.region ? `当前已有【${st.typeName}】在【${regionNameOf(st.region)}】现世，不能重复安排。` : '当前Boss正在逃亡冷却中，不能重复安排。')
+      return true
+    }
+    saveBoss(st, gid)
+    e.reply(`✅ 已安排当前群下一只世界Boss约1分钟后刷新；发送 #boss状态 可查看倒计时。`)
+    return true
+  }
   /* ---- #攻击boss: 加入持续讨伐(自动攻击, 发送一次不用管, 无前摇后摇) ---- */
   async attackBoss (e) {
     if (!e.group_id) { e.reply('需在群内讨伐~'); return true }
@@ -151,7 +165,14 @@ export class boss extends plugin {
     if (!e.group_id) { e.reply('需在群内查看~'); return true }
     const gid = String(e.group_id)
     const st = getBoss(gid)
-    if (!st.region) { e.reply('当前没有现世的世界Boss，等待刷新吧~'); return true }
+    if (!st.region) {
+      const next = Number(st.fleeEnd) > Date.now()
+        ? st.fleeEnd
+        : (Number(st.forceSpawnAt) > Date.now() ? st.forceSpawnAt : st.nextSpawn)
+      const wait = next > Date.now() ? `预计${new Date(next).toLocaleString('zh-CN', { hour12: false })}刷新（约${Math.ceil((next - Date.now()) / 60000)}分钟后）` : '正在等待系统安排刷新时间'
+      e.reply(`当前没有现世的世界Boss，${wait}。`)
+      return true
+    }
     const remainMin = Math.max(0, Math.ceil((st.end - Date.now()) / 60000))
     const pct = Math.max(0, Math.round(st.hp / st.maxHp * 100))
     const barLen = 20
@@ -371,7 +392,17 @@ async function bossTick (gid) {
         changed = true
       }
     }
-    /* 2. 逃跑冷却结束→随机大区重生(保留同一Boss与逃遁计数) */
+    /* 2. 主人临时安排的单次刷新: 不受周期次数/旧 nextSpawn 影响，只生成这一只Boss */
+    const forceDue = !st.region && !st.fleeEnd && Number(st.forceSpawnAt) > 0 && now >= st.forceSpawnAt
+    if (forceDue) {
+      st.forceSpawnAt = 0
+      st.spawnCount = Math.min(MAX_SPAWN_PER_CYCLE, (Number(st.spawnCount) || 0) + 1)
+      const info = await spawnBoss(st, gid)
+      sendToGroup(gid, randText(SPAWN_TEXTS).replace(/\{region\}/g, regionNameOf(info.target)).replace(/\{name\}/g, info.name))
+      try { logBossEvent(gid, `【出世】天象异变！【${info.name}】现身${regionNameOf(info.target)}！（临时安排刷新）`) } catch (err) { }
+      changed = true
+    }
+    /* 3. 逃跑冷却结束→随机大区重生(保留同一Boss与逃遁计数) */
     if (!st.region && st.fleeEnd && now >= st.fleeEnd) {
       st.fleeEnd = 0
       const info = await spawnBoss(st, gid, null, true)
@@ -380,8 +411,8 @@ async function bossTick (gid) {
       try { logBossEvent(gid, `【出世】天象异变！【${info.name}】在${regionNameOf(info.target)}重现！（伤势未愈归来，血量 ${hpPct}%）`) } catch (err) { }
       changed = true
     }
-    /* 3. 无Boss无逃跑: 到点生成(2天周期≥1≤3次) */
-    if (!st.region && !st.fleeEnd && now >= st.nextSpawn) {
+    /* 4. 无Boss无逃跑: 到点生成(2天周期≥1≤3次)；已有临时预约时等待预约时间 */
+    if (!st.region && !st.fleeEnd && !st.forceSpawnAt && now >= st.nextSpawn) {
       if (st.spawnCount >= MAX_SPAWN_PER_CYCLE || now - st.cycleStart >= CYCLE_MS) {
         st.cycleStart = now
         st.spawnCount = 0

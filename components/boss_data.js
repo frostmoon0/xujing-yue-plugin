@@ -18,13 +18,17 @@ const BOSS_FILE = `${BOSS_DIR}/boss.json` // 旧全局档(仅首次迁移用)
 
 /** 每群独立存档: data/.../world/boss_{gid}.json */
 function bossFile (gid) { return `${BOSS_DIR}/boss_${gid}.json` }
-/** 所有活跃群(已有独立存档的群) */
+/** 从存档文件名提取需要由 Boss 调度器维护的群号。 */
+export function mergeBossGroupIds (names) {
+  return [...new Set((names || [])
+    .filter(name => /^(?:boss|world)_\d+\.json$/.test(name))
+    .map(name => name.replace(/^(?:boss|world)_|\.json$/g, '')))]
+}
+/** 所有活跃群(已有世界档或Boss独立档的群) */
 export function activeBossGroups () {
   try {
     if (!fs.existsSync(BOSS_DIR)) return []
-    return fs.readdirSync(BOSS_DIR)
-      .filter(n => /^boss_\d+\.json$/.test(n))
-      .map(n => n.replace(/^boss_|\.json$/g, ''))
+    return mergeBossGroupIds(fs.readdirSync(BOSS_DIR))
   } catch (err) { return [] }
 }
 
@@ -46,6 +50,7 @@ export const FLEE_MIN = [60, 180] // 逃跑冷却1~3小时(分钟)
 export const REGEN_PER_HOUR = 0.15 // 逃跑回血: 重生时每小时恢复最大血量15%
 export const FIRST_SPAWN_MIN = [6 * 60, 36 * 60] // 周期首刷 6~36小时(确保2天内≥1)
 export const NEXT_SPAWN_MIN = [DAILY_RANDOM_SPAWN_MIN, DAILY_RANDOM_SPAWN_MAX] // 击杀后下次 3~24小时
+export const BOSS_SOON_DELAY = 60 * 1000
 
 /* ---------- Boss类型(四百余种) ---------- */
 // [名称, tier]  tier: 1普通/2精英/3王级/4传说
@@ -196,7 +201,8 @@ function emptyBoss () {
     end: 0, fleeEnd: 0, fleeCount: 0, spawnCount: 0, cycleStart: 0, nextSpawn: 0,
     damage: {}, attackGid: {}, lastBcast: 0, token: null,
     auto: {}, // 持续讨伐: uid -> { gid, start, lastHit }
-    fleeHpRatio: 0, fleeAt: 0 // 逃跑残血: 剩余血量比例 + 逃跑时间戳(重生按逃跑时长回血)
+    fleeHpRatio: 0, fleeAt: 0, // 逃跑残血: 剩余血量比例 + 逃跑时间戳(重生按逃跑时长回血)
+    forceSpawnAt: 0
   }
 }
 export function getBoss (gid) {
@@ -204,8 +210,9 @@ export function getBoss (gid) {
   const file = bossFile(g)
   try {
     if (!fs.existsSync(file)) {
-      /* 旧全局档迁移: 尚无任何独立存档时, 旧 boss.json 归第一个群 */
-      if (fs.existsSync(BOSS_FILE) && !activeBossGroups().length) {
+      /* 旧全局档迁移: 只检查是否已有独立 Boss 档，不能用 activeBossGroups()（它现在也包含 world_<gid>.json） */
+      const hasBossFile = fs.readdirSync(BOSS_DIR).some(n => /^boss_\d+\.json$/.test(n))
+      if (fs.existsSync(BOSS_FILE) && !hasBossFile) {
         try { fs.renameSync(BOSS_FILE, file) } catch (err) { }
       }
       if (!fs.existsSync(file)) {
@@ -247,6 +254,13 @@ export function delAutoAtk (st, uid) {
 
 /** 随机整数区间 */
 function rand ([a, b]) { return a + Math.floor(Math.random() * (b - a + 1)) }
+
+export function scheduleBossSoon (st, delayMs = BOSS_SOON_DELAY, at = Date.now()) {
+  if (!st || st.region || Number(st.fleeEnd) > at) return false
+  const delay = Math.max(1000, Number(delayMs) || BOSS_SOON_DELAY)
+  st.forceSpawnAt = at + delay
+  return true
+}
 
 /* ---------- 夜间判断 ---------- */
 export function isNight (now = new Date()) {

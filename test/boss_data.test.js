@@ -3,15 +3,33 @@ import assert from 'node:assert/strict'
 import {
   BOSS_YAODAN_RANGES,
   rollBossYaodanTier,
-  planBossLoot
+  planBossLoot,
+  mergeBossGroupIds,
+  BOSS_SOON_DELAY,
+  scheduleBossSoon
 } from '../components/boss_data.js'
 import { yaodanName } from '../components/equip_data.js'
 
-test('妖丹名按阶数生成', () => {
+test('世界Boss调度同时识别世界档和Boss档，且去重', () => {
+  assert.deepEqual(
+    mergeBossGroupIds(['world_100.json', 'boss_100.json', 'world_200.json', 'fake_300.json', 'boss_cfg.json']),
+    ['100', '200']
+  )
+})
+test('世界Boss可单独预约一只稍后刷新，不改全局首刷周期', () => {
+  assert.equal(BOSS_SOON_DELAY, 60000)
+  const st = { region: null, fleeEnd: 0, forceSpawnAt: 0 }
+  assert.equal(scheduleBossSoon(st, BOSS_SOON_DELAY, 1000000), true)
+  assert.equal(st.forceSpawnAt, 1000000 + 60000)
+  assert.equal(scheduleBossSoon({ region: 'center', fleeEnd: 0 }, BOSS_SOON_DELAY, 1000000), false)
+  assert.equal(scheduleBossSoon({ region: null, fleeEnd: 2000000 }, BOSS_SOON_DELAY, 1000000), false)
+})
+test('世界Boss妖丹名按阶数生成', () => {
   assert.equal(yaodanName(1), '一阶妖丹')
   assert.equal(yaodanName(4), '四阶妖丹')
   assert.equal(yaodanName(7), '七阶妖丹')
 })
+
 
 test('世界Boss妖丹掉落阶位范围按档位', () => {
   assert.deepEqual(BOSS_YAODAN_RANGES, { 1: [1, 3], 2: [2, 4], 3: [3, 6], 4: [6, 7] })

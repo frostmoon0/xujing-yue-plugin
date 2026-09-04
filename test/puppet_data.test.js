@@ -5,11 +5,13 @@ import {
   PUPPET_UPGRADE_COSTS,
   PUPPET_POWER_RANGES,
   PUPPET_MAX_POWER,
+  PUPPET_POWER_MULTIPLIER,
   PUPPET_PASSIVES,
   PUPPET_CHAPTERS,
   PUPPET_TECHNIQUE_FRAGMENT,
   PUPPET_DEPLOY_COST_PER_RANK,
   puppetDeployCost,
+  getPuppetPower,
   parsePuppetTechniqueDismantleCmd,
   rollPuppetPower,
   puppetChapterForRank,
@@ -40,6 +42,13 @@ test('傀儡祭出费用按阶位递增, 每升一阶增加一万灵石', () => 
 })
 
 
+test('祭出傀儡战力按基础战力1.5倍计入，未祭出不计入', () => {
+  assert.equal(PUPPET_POWER_MULTIPLIER, 1.5)
+  const bag = { artifacts: { puppets: [{ id: 'p', name: '测试傀儡', rank: 3, power: 1001, passive: 'atk', equipped: true, deployed: true, nextChargeAt: Date.now() + 60000 }] } }
+  assert.equal(getPuppetPower(bag), 1502)
+  bag.artifacts.puppets[0].deployed = false
+  assert.equal(getPuppetPower(bag), 0)
+})
 test('傀儡术分解指令兼容有无空格并解析数量', () => {
   assert.deepEqual(parsePuppetTechniqueDismantleCmd('#分解傀儡术 傀儡术下篇 3'), { name: '傀儡术下篇', amount: 3 })
   assert.deepEqual(parsePuppetTechniqueDismantleCmd('#分解傀儡术下篇3'), { name: '傀儡术下篇', amount: 3 })
@@ -52,6 +61,7 @@ test('傀儡术分解指令兼容有无空格并解析数量', () => {
   addItemToBag(bag, PUPPET_TECHNIQUE_FRAGMENT, 3, null, false)
   assert.equal(bag.items[PUPPET_TECHNIQUE_FRAGMENT].count, 3)
 })
+
 
 test('傀儡术按篇章开放阶位', () => {
   assert.equal(puppetChapterForRank(1), '傀儡术下篇')

@@ -38,6 +38,7 @@ export const PUPPET_POWER_RANGES = {
   7: [1200, 1600]
 }
 export const PUPPET_MAX_POWER = 7000
+export const PUPPET_POWER_MULTIPLIER = 1.5
 
 /**
  * 一阶打造配方。万阵核心已是成品，因此只额外收取制作4个核心所需的四种阵材各4个，
@@ -252,7 +253,7 @@ export function getPuppetBattleBuff (bag) {
 export function getPuppetPower (bag) {
   const puppet = currentOfBag(bag)
   if (!puppet || !puppet.deployed || !puppet.nextChargeAt || puppet.nextChargeAt <= now()) return 0
-  return clampPower(puppet.power)
+  return Math.round(clampPower(puppet.power) * PUPPET_POWER_MULTIPLIER)
 }
 
 export function puppetPassiveText (puppet) {
@@ -500,7 +501,7 @@ export async function deployPuppet (uid, gid = 'global') {
   puppet.nextChargeAt = now() + DEPLOY_INTERVAL
   puppet.deployedUntil = puppet.nextChargeAt
   saveBag(uid, bag, gid)
-  return { ok: true, msg: `⚔️${puppet.name}已祭出！立即消耗${cost.toLocaleString()}灵石，持续30分钟；当前战力额外+${puppet.power}，${puppetPassiveText(puppet)}。灵石充足时每30分钟按${cost.toLocaleString()}灵石自动续费。` }
+  return { ok: true, msg: `⚔️${puppet.name}已祭出！立即消耗${cost.toLocaleString()}灵石，持续30分钟；当前战力额外+${Math.round(puppet.power * PUPPET_POWER_MULTIPLIER)}（基础${puppet.power}×${PUPPET_POWER_MULTIPLIER}），${puppetPassiveText(puppet)}。灵石充足时每30分钟按${cost.toLocaleString()}灵石自动续费。` }
 }
 
 export function recallPuppet (uid, gid = 'global') {
@@ -633,6 +634,7 @@ export default {
   PUPPET_TECHNIQUE_FRAGMENT,
   PUPPET_INITIAL_COST,
   PUPPET_UPGRADE_COSTS,
+  PUPPET_POWER_MULTIPLIER,
   PUPPET_PASSIVES,
   PUPPET_PASSIVE_CORE,
   PUPPET_DEPLOY_COST_PER_RANK,
